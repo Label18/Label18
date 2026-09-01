@@ -330,9 +330,8 @@
     transform: translateY(30px);
 }
 
-/* New hero sections — First and Last slides stay LEFT BOTTOM */
-.text-first,
-.text-last {
+/* New hero sections — First slide stays LEFT BOTTOM */
+.text-first {
     top: auto !important;
     right: auto !important;
     bottom: 14% !important;
@@ -350,7 +349,7 @@
     right: auto;
     transform: translateY(30px);
     text-align: left;
-    max-width: 320px;
+    max-width: 540px;
     padding: 0.8rem 1.2rem;
     background: transparent;
 }
@@ -363,13 +362,16 @@
 
 .hero-text-right .hero-desc {
     margin-left: 0;
-    max-width: 280px;
+    max-width: 340px;
     margin-bottom: 0.5rem;
+    font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+    line-height: 1.5;
 }
 
 .hero-text-right .hero-title-bold {
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-    margin-bottom: 0.5rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem);
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
 }
 
 .hero-text-right .accent-bar {
@@ -392,7 +394,7 @@
     right: auto !important;
     text-align: left !important;
     transform: translateY(30px);
-    max-width: 320px;
+    max-width: 540px;
     padding: 0.8rem 1.2rem;
     background: transparent;
 }
@@ -440,16 +442,18 @@
 #hero5 .hero-text-overlay:not(.text-first):not(.text-last) .hero-desc,
 #hero6 .hero-text-overlay:not(.text-first):not(.text-last) .hero-desc {
     margin-left: 0;
-    max-width: 280px;
+    max-width: 340px;
     margin-bottom: 0.5rem;
+    font-size: clamp(0.72rem, 0.9vw, 0.82rem);
 }
 
 #hero3 .hero-text-overlay:not(.text-first):not(.text-last) .hero-title-bold,
 #hero4 .hero-text-overlay:not(.text-first):not(.text-last) .hero-title-bold,
 #hero5 .hero-text-overlay:not(.text-first):not(.text-last) .hero-title-bold,
 #hero6 .hero-text-overlay:not(.text-first):not(.text-last) .hero-title-bold {
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-    margin-bottom: 0.5rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem);
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
 }
 
 #hero3 .hero-text-overlay:not(.text-first):not(.text-last) .accent-bar,
@@ -467,7 +471,7 @@
     letter-spacing: 0.3em;
 }
 
-/* Grand Final Slide presentation across all sections — Matches Hero 1 perfectly */
+/* Grand Final Slide presentation across all sections — Matches the exact position where intermediate descriptions close */
 #hero-text-6,
 .text-last,
 #hero2 .hero-text-overlay.text-last,
@@ -478,11 +482,11 @@
     position: absolute;
     top: auto !important;
     right: auto !important;
-    bottom: 14% !important;
-    left: 6% !important;
+    bottom: 4% !important;
+    left: 3% !important;
     text-align: left !important;
-    max-width: 700px !important;
-    padding: 0 2rem !important;
+    max-width: 540px !important;
+    padding: 0.8rem 1.2rem !important;
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -497,9 +501,10 @@
 #hero3 .hero-text-overlay.text-last .hero-title-bold,
 #hero4 .hero-text-overlay.text-last .hero-title-bold,
 #hero5 .hero-text-overlay.text-last .hero-title-bold {
-    font-size: clamp(2.2rem, 4.5vw, 3.8rem) !important;
-    margin-bottom: 1rem !important;
-    line-height: 1.05 !important;
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem) !important;
+    margin-bottom: 0.6rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
 }
 
 #hero-text-6 .hero-desc,
@@ -508,10 +513,10 @@
 #hero3 .hero-text-overlay.text-last .hero-desc,
 #hero4 .hero-text-overlay.text-last .hero-desc,
 #hero5 .hero-text-overlay.text-last .hero-desc {
-    font-size: clamp(0.95rem, 1.2vw, 1.15rem) !important;
-    max-width: 480px !important;
-    margin-bottom: 2rem !important;
-    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: clamp(0.72rem, 0.9vw, 0.82rem) !important;
+    max-width: 340px !important;
+    margin-bottom: 0.8rem !important;
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 
 #hero-text-6 .hero-accent-line,
@@ -521,8 +526,8 @@
 #hero4 .hero-text-overlay.text-last .hero-accent-line,
 #hero5 .hero-text-overlay.text-last .hero-accent-line {
     justify-content: flex-start !important;
-    margin-bottom: 1.2rem !important;
-    gap: 1rem !important;
+    margin-bottom: 0.5rem !important;
+    gap: 0.5rem !important;
 }
 
 #hero-text-6 .accent-bar,
@@ -531,7 +536,7 @@
 #hero3 .hero-text-overlay.text-last .accent-bar,
 #hero4 .hero-text-overlay.text-last .accent-bar,
 #hero5 .hero-text-overlay.text-last .accent-bar {
-    width: 40px !important;
+    width: 24px !important;
 }
 
 #hero-text-6 .accent-label,
@@ -540,8 +545,14 @@
 #hero3 .hero-text-overlay.text-last .accent-label,
 #hero4 .hero-text-overlay.text-last .accent-label,
 #hero5 .hero-text-overlay.text-last .accent-label {
-    font-size: 0.65rem !important;
-    letter-spacing: 0.25em !important;
+    font-size: 0.5rem !important;
+    letter-spacing: 0.3em !important;
+}
+
+.text-last .hero-cta-pill {
+    padding: 0.6rem 1.6rem;
+    font-size: 0.55rem;
+    margin-top: 0.2rem;
 }
 
 .hero-accent-line {
@@ -578,17 +589,18 @@
 
 .hero-title-bold {
     font-family: var(--font-heading);
-    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-size: clamp(1.8rem, 4.2vw, 3.8rem);
     font-weight: 900;
-    letter-spacing: -0.03em;
-    line-height: 0.9;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
     text-transform: uppercase;
     color: white;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+    white-space: nowrap;
 }
 
 .hero-title-md {
-    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    font-size: clamp(1.2rem, 2.6vw, 2.2rem);
 }
 
 .hero-title-center {
@@ -596,19 +608,18 @@
 }
 
 .hero-title-stroke {
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.35);
-    display: block;
+    color: white;
+    display: inline;
 }
 
 .hero-desc {
     font-family: var(--font-body);
-    font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+    font-size: clamp(0.72rem, 0.9vw, 0.82rem);
     font-weight: 400;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.45);
-    max-width: 360px;
-    margin-bottom: 2rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 380px;
+    margin-bottom: 1.5rem;
 }
 
 .hero-desc-center {
@@ -2133,14 +2144,14 @@
     }
 
     .category-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
     }
 
     .category-grid .category-card:last-child {
-        grid-column: 1 / -1;
-        max-width: 50%;
-        margin: 0 auto;
+        grid-column: auto;
+        max-width: 100%;
+        margin: 0;
     }
 
     .quality-grid {
@@ -2239,18 +2250,34 @@
     .category-grid {
         grid-template-columns: 1fr;
         gap: 1.25rem;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 
     .category-grid .category-card:last-child {
         max-width: 100%;
+        margin: 0;
     }
 
     .category-card-image {
-        height: 200px;
+        height: 230px;
     }
 
     .category-card {
         border-radius: 1.25rem;
+    }
+
+    .category-card-label {
+        bottom: 1.2rem;
+        padding: 0 1rem;
+    }
+
+    .category-card-label h3 {
+        font-size: 1.15rem;
+    }
+
+    .category-card-label p {
+        font-size: 0.72rem;
     }
 
     .quality-grid {
@@ -2956,20 +2983,4 @@ body {
     --font-body: var(--font-cormorant);
     --font-heading: var(--font-cinzel);
     --font-serif: var(--font-playfair);
-}
-
-/* Right-aligned text blocks */
-.text-align-right {
-    text-align: right !important;
-    align-items: flex-end !important;
-}
-
-.text-align-right .hero-accent-line {
-    justify-content: flex-end !important;
-    flex-direction: row-reverse !important;
-}
-
-.text-align-right .accent-bar {
-    margin-right: 0 !important;
-    margin-left: 15px !important;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { CategoryTree } from "@/lib/categories";
 
@@ -30,13 +31,23 @@ export default function ProductFilters({
   const maxPrice = searchParams.get("max") ?? "";
   const sort = searchParams.get("sort") ?? "newest";
 
+  const [searchVal, setSearchVal] = useState(search);
+  const [minVal, setMinVal] = useState(minPrice);
+  const [maxVal, setMaxVal] = useState(maxPrice);
+
+  useEffect(() => {
+    setSearchVal(searchParams.get("q") ?? "");
+    setMinVal(searchParams.get("min") ?? "");
+    setMaxVal(searchParams.get("max") ?? "");
+  }, [searchParams]);
+
   const hasActiveFilters =
-    !!search ||
+    !!searchVal ||
     (!initialCategoryId && !!categoryId) ||
     !!subCategoryId ||
     !!subSubCategoryId ||
-    !!minPrice ||
-    !!maxPrice ||
+    !!minVal ||
+    !!maxVal ||
     sort !== "newest";
 
   function updateParams(next: Record<string, string | null>) {
@@ -71,17 +82,23 @@ export default function ProductFilters({
   }
 
   function clearAllFilters() {
-    // If basePath or current path points to the deleted root categories page, redirect safely to /shop
-    if (basePath === "/categories" || pathname === "/categories") {
+    setSearchVal("");
+    setMinVal("");
+    setMaxVal("");
+
+    // If on a specific category page (e.g. Jewellery / Clothing), reset to the base category URL
+    if (initialCategoryId) {
+      router.push(`/categories/${initialCategoryId}`);
+      return;
+    }
+
+    // If on the bare "/categories" root with no specific category, redirect to /shop
+    if (pathname === "/categories") {
       router.push("/shop");
       return;
     }
     
-    if (basePath) {
-      router.push(basePath);
-      return;
-    }
-    
+    // On /shop or other pages, stay on the current pathname without query params
     router.push(pathname);
   }
 
@@ -95,8 +112,11 @@ export default function ProductFilters({
         {/* Search */}
         <div className="relative shrink-0">
           <input
-            defaultValue={search}
-            onChange={(e) => updateParams({ q: e.target.value || null })}
+            value={searchVal}
+            onChange={(e) => {
+              setSearchVal(e.target.value);
+              updateParams({ q: e.target.value || null });
+            }}
             placeholder="Search..."
             className={`${inputClass} w-44 md:w-52 pl-11`}
           />
@@ -154,16 +174,22 @@ export default function ProductFilters({
         <div className="flex items-center gap-2 shrink-0">
           <input
             type="number"
-            defaultValue={minPrice}
-            onChange={(e) => updateParams({ min: e.target.value || null })}
+            value={minVal}
+            onChange={(e) => {
+              setMinVal(e.target.value);
+              updateParams({ min: e.target.value || null });
+            }}
             placeholder="Min ₹"
             className={`${inputClass} w-28 text-center px-3`}
           />
           <span className="text-[#1A1A1A]/40">-</span>
           <input
             type="number"
-            defaultValue={maxPrice}
-            onChange={(e) => updateParams({ max: e.target.value || null })}
+            value={maxVal}
+            onChange={(e) => {
+              setMaxVal(e.target.value);
+              updateParams({ max: e.target.value || null });
+            }}
             placeholder="Max ₹"
             className={`${inputClass} w-28 text-center px-3`}
           />

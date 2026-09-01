@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CanvasSequence, { SequenceConfig } from "@/components/CanvasSequence";
 import { getCategoriesTree, CategoryTree } from "@/lib/categories";
+import ExpandableCategoryDescription from "@/components/ExpandableCategoryDescription";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -67,8 +68,6 @@ export default function Home() {
         "/sequence3/ezgif-frame-150.jpg",
     ];
 
-    const floatClasses = ["float-v2 delay-1", "float-diag delay-2", "float-breathe delay-3", "float-drift delay-1", "float-v1 delay-2"];
-
     useGSAP(() => {
         // === SECTION 1 LOGIC ===
         const tlScroll = gsap.timeline({
@@ -76,7 +75,7 @@ export default function Home() {
                 trigger: scrollSectionRef.current,
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1,
+                scrub: 0.8,
                 onUpdate: (self) => {
                     setScrollProgress(self.progress);
                 }
@@ -84,38 +83,42 @@ export default function Home() {
         });
 
         const textCount = textRefs.current.length;
+        const slot1 = 1 / textCount;
         textRefs.current.forEach((text, i) => {
             if (!text) return;
 
             const isLast = i === textCount - 1;
-            const startOffset = i === 0 ? 0.05 : (i / textCount) - 0.05;
-            const endOffset = isLast ? 1 : (i + 1) / textCount;
+            const wStart = i * slot1;
+            const wEnd = (i + 1) * slot1;
+            const fadeDur = slot1 * 0.28;
 
             if (i === 0) {
+                // Starts immediately visible, stays full, then fades out completely before next slot
                 tlScroll.fromTo(text,
                     { opacity: 1, y: 0, scale: 1 },
-                    { opacity: 1, y: 0, scale: 1, duration: 0.05 },
-                    startOffset
+                    { opacity: 1, y: 0, scale: 1, duration: slot1 * 0.65 },
+                    wStart
                 ).to(text,
-                    { opacity: 0, y: -20, scale: 1.02, duration: 0.05 },
-                    endOffset - 0.05
+                    { opacity: 0, y: -25, scale: 1.02, duration: fadeDur },
+                    wEnd - fadeDur - (slot1 * 0.05)
                 );
             } else if (isLast) {
+                // Fades in only after previous has completely faded away, then remains visible
                 tlScroll.fromTo(text,
-                    { opacity: 0, y: 30, scale: 0.97 },
-                    { opacity: 1, y: 0, scale: 1, duration: 0.1 },
-                    startOffset
+                    { opacity: 0, y: 25, scale: 0.98 },
+                    { opacity: 1, y: 0, scale: 1, duration: fadeDur * 1.2 },
+                    wStart
                 );
             } else {
+                // Fades in after previous is gone, stays visible, fades out completely before next slot
                 tlScroll.fromTo(text,
-                    { opacity: 0, y: 30, scale: 0.97 },
-                    { opacity: 1, y: 0, scale: 1, duration: 0.05 },
-                    startOffset
-                )
-                    .to(text,
-                        { opacity: 0, y: -20, scale: 1.02, duration: 0.05 },
-                        endOffset - 0.05
-                    );
+                    { opacity: 0, y: 25, scale: 0.98 },
+                    { opacity: 1, y: 0, scale: 1, duration: fadeDur },
+                    wStart
+                ).to(text,
+                    { opacity: 0, y: -25, scale: 1.02, duration: fadeDur },
+                    wEnd - fadeDur - (slot1 * 0.05)
+                );
             }
         });
 
@@ -128,7 +131,7 @@ export default function Home() {
                 trigger: scrollSectionRef2.current,
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1,
+                scrub: 0.8,
                 onUpdate: (self) => {
                     setScrollProgress2(self.progress);
                 }
@@ -136,39 +139,42 @@ export default function Home() {
         });
 
         const textCount2 = textRefs2.current.length;
+        const slot2 = 1 / textCount2;
         textRefs2.current.forEach((text, i) => {
             if (!text) return;
 
             const isLast = i === textCount2 - 1;
-            const startOffset = i === 0 ? 0 : (i / textCount2) - 0.05;
-            const fadeInDuration = i === 0 ? 0.001 : 0.05;
-            const endOffset = isLast ? 1 : (i + 1) / textCount2;
+            const wStart = i * slot2;
+            const wEnd = (i + 1) * slot2;
+            const fadeDur2 = slot2 * 0.28;
 
             if (i === 0) {
+                // Starts immediately visible, stays full, then fades out completely before next slot
                 tlScroll2.fromTo(text,
                     { opacity: 1, y: 0, scale: 1 },
-                    { opacity: 1, y: 0, scale: 1, duration: fadeInDuration },
-                    startOffset
+                    { opacity: 1, y: 0, scale: 1, duration: slot2 * 0.65 },
+                    wStart
                 ).to(text,
-                    { opacity: 0, y: -20, scale: 1.02, duration: 0.05 },
-                    endOffset - 0.05
+                    { opacity: 0, y: -25, scale: 1.02, duration: fadeDur2 },
+                    wEnd - fadeDur2 - (slot2 * 0.05)
                 );
             } else if (isLast) {
+                // Fades in only after previous has completely faded away, then remains visible
                 tlScroll2.fromTo(text,
-                    { opacity: 0, y: 30, scale: 0.97 },
-                    { opacity: 1, y: 0, scale: 1, duration: fadeInDuration },
-                    startOffset
+                    { opacity: 0, y: 25, scale: 0.98 },
+                    { opacity: 1, y: 0, scale: 1, duration: fadeDur2 * 1.2 },
+                    wStart
                 );
             } else {
+                // Fades in after previous is gone, stays visible, fades out completely before next slot
                 tlScroll2.fromTo(text,
-                    { opacity: 0, y: 30, scale: 0.97 },
-                    { opacity: 1, y: 0, scale: 1, duration: fadeInDuration },
-                    startOffset
-                )
-                    .to(text,
-                        { opacity: 0, y: -20, scale: 1.02, duration: 0.05 },
-                        endOffset - 0.05
-                    );
+                    { opacity: 0, y: 25, scale: 0.98 },
+                    { opacity: 1, y: 0, scale: 1, duration: fadeDur2 },
+                    wStart
+                ).to(text,
+                    { opacity: 0, y: -25, scale: 1.02, duration: fadeDur2 },
+                    wEnd - fadeDur2 - (slot2 * 0.05)
+                );
             }
         });
 
@@ -223,7 +229,7 @@ export default function Home() {
         <main ref={containerRef} className="bg-black">
 
             {/* ============================================================ */}
-            {/* HERO SECTION 1 - ETHNIC WEAR                                 */}
+            {/* HERO SECTION 1 - ETHNIC WEAR / CLOTHING                     */}
             {/* ============================================================ */}
             <section id="hero" ref={scrollSectionRef} className="hero-section" style={{ height: "1200vh" }}>
                 <div className="hero-sticky">
@@ -240,23 +246,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">The Label 18</span>
                         </div>
-                        <h1 className="hero-title-bold" style={{ color: "var(--color-gold)" }}>
-                            A NEW<br />
-                            <span className="hero-title-stroke">ERA</span>
+                        <h1 className="hero-title-bold">
+                            <span style={{ color: "var(--color-gold)" }}>A NEW</span> <span style={{ color: "#ffffff" }}>ERA</span>
                         </h1>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Discover an aesthetic defined by its energy and crafted with absolute precision.</p>
+                        <p className="hero-desc">Discover an aesthetic defined by its energy and crafted with absolute precision.</p>
                     </div>
 
-                    <div ref={el => { textRefs.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Craftsmanship</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            CRAFTED TO<br />
-                            <span className="hero-title-stroke">PERFECTION</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>CRAFTED TO</span> <span style={{ color: "#ffffff" }}>PERFECTION</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Over 40 individual pieces, meticulously assembled by master artisans.</p>
+                        <p className="hero-desc">Over 40 individual pieces, meticulously assembled by master artisans.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[2] = el; }} className="hero-text-overlay hero-text-right">
@@ -264,23 +268,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Essence</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            EXPRESS YOUR<br />
-                            <span className="hero-title-stroke">ESSENCE</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>EXPRESS YOUR</span> <span style={{ color: "#ffffff" }}>ESSENCE</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Every detail, every stitch, designed to reflect your inner vitality.</p>
+                        <p className="hero-desc">Every detail, every stitch, designed to reflect your inner vitality.</p>
                     </div>
 
-                    <div ref={el => { textRefs.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Materials</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            PREMIUM<br />
-                            <span className="hero-title-stroke">TEXTURES</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>PREMIUM</span> <span style={{ color: "#ffffff" }}>TEXTURES</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Exquisite materials engineered for absolute durability and an unforgettable touch.</p>
+                        <p className="hero-desc">Exquisite materials engineered for absolute durability and an unforgettable touch.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[4] = el; }} className="hero-text-overlay hero-text-right">
@@ -288,23 +290,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Elegance</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            TIMELESS<br />
-                            <span className="hero-title-stroke">ELEGANCE</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>TIMELESS</span> <span style={{ color: "#ffffff" }}>ELEGANCE</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Where modern design meets eternal grace. A perfect balance of form and function.</p>
+                        <p className="hero-desc">Where modern design meets eternal grace. A perfect balance of form and function.</p>
                     </div>
 
-                    <div ref={el => { textRefs.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Silhouette</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            COMPLETE<br />
-                            <span className="hero-title-stroke">PROFILE</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>COMPLETE</span> <span style={{ color: "#ffffff" }}>PROFILE</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>A stunning silhouette that commands attention from absolutely every angle.</p>
+                        <p className="hero-desc">A stunning silhouette that commands attention from absolutely every angle.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[6] = el; }} className="hero-text-overlay hero-text-right">
@@ -312,24 +312,22 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Luxury</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            REFINED<br />
-                            <span className="hero-title-stroke">LUXURY</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>REFINED</span> <span style={{ color: "#ffffff" }}>LUXURY</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Uncompromised quality that speaks volumes without saying a single word.</p>
+                        <p className="hero-desc">Uncompromised quality that speaks volumes without saying a single word.</p>
                     </div>
 
-                    <div ref={el => { textRefs.current[7] = el; }} className="hero-text-overlay text-last">
+                    <div ref={el => { textRefs.current[7] = el; }} className="hero-text-overlay hero-text-right text-last">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Collection</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            MAKE IT<br />
-                            <span className="hero-title-stroke">YOURS</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>MAKE IT</span> <span style={{ color: "#ffffff" }}>YOURS</span>
                         </h2>
                         <Link href={clothingCat ? `/categories/${clothingCat.id}` : "/categories"} className="hero-cta-pill">
-                            Explore {clothingCat?.name || "Ethnic Wear"}
+                            Explore {clothingCat?.name || "Clothing"}
                         </Link>
                     </div>
 
@@ -347,22 +345,25 @@ export default function Home() {
             </section>
 
             {/* ============================================================ */}
-            {/* ETHNIC WEAR PRODUCTS SHOWCASE                                */}
+            {/* CLOTHING PRODUCTS SHOWCASE                                   */}
             {/* ============================================================ */}
-            <section className="bg-black relative z-10" style={{ paddingTop: "6rem", paddingBottom: "8rem" }}>
-                <div className="w-full flex justify-center px-0 sm:px-6 lg:px-8">
+            <section className="bg-[#F8F6F0] relative z-10 text-[#1A1A1A] py-14 sm:py-20 md:py-28">
+                <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-7xl">
-                        <div className="flex flex-col items-center text-center mb-16">
-                            <div className="hero-accent-line justify-center mb-4">
-                                <span className="accent-label">Explore Category</span>
+                        <div className="flex flex-col items-center text-center mb-10 sm:mb-14 md:mb-16">
+                            <div className="hero-accent-line justify-center mb-3 sm:mb-4">
+                                <span className="accent-label" style={{ color: "#9c7d23" }}>Explore Category</span>
                             </div>
-                            <h2 className="hero-title-bold" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: "var(--color-gold)", marginBottom: "1rem" }}>
-                                ETHNIC WEAR<br />
-                                <span className="hero-title-stroke" style={{ fontSize: 'clamp(2.8rem, 5.5vw, 4.5rem)' }}>COLLECTION</span>
+                            <h2 className="hero-title-bold font-outfit text-center whitespace-normal sm:whitespace-nowrap" style={{ fontSize: 'clamp(1.6rem, 5.5vw, 3.2rem)', color: "#1A1A1A", marginBottom: "0.75rem" }}>
+                                <span style={{ color: "var(--color-gold)" }}>CLOTHING</span> CATEGORY
                             </h2>
+                            <ExpandableCategoryDescription
+                                description={clothingCat?.description || "Discover exquisite ethnic silhouettes, signature sarees, and festive wear tailored for graceful elegance."}
+                                variant="light"
+                            />
                         </div>
 
-                        <div className="category-grid" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+                        <div className="category-grid">
                             {(clothingCat?.sub_categories && clothingCat.sub_categories.length > 0
                                 ? clothingCat.sub_categories
                                 : [
@@ -375,11 +376,10 @@ export default function Home() {
                                     ? `/categories/${clothingCat.id}/${sub.id}`
                                     : clothingCat ? `/categories/${clothingCat.id}` : "/shop";
                                 const img = sub.image_url || fallbackClothingImages[i % fallbackClothingImages.length];
-                                const floatClass = floatClasses[i % floatClasses.length];
                                 return (
-                                    <Link href={href} key={sub.id || i} className="category-card hover-float-parent">
+                                    <Link href={href} key={sub.id || i} className="category-card group bg-white shadow-sm border border-[#1A1A1A]/10">
                                         <div className="category-card-image">
-                                            <img src={img} alt={sub.name} loading="lazy" className={`floating-img ${floatClass}`} />
+                                            <img src={img} alt={sub.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                             <div className="category-card-gradient"></div>
                                             <div className="category-card-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', width: '100%', left: 0, right: 0 }}>
                                                 <h3 style={{ textAlign: 'center', margin: 0, width: '100%' }}>{sub.name}</h3>
@@ -396,7 +396,7 @@ export default function Home() {
             </section>
 
             {/* ============================================================ */}
-            {/* HERO SECTION 2 - JEWELRY                                   */}
+            {/* HERO SECTION 2 - JEWELRY                                     */}
             {/* ============================================================ */}
             <section id="hero2" ref={scrollSectionRef2} className="hero-section" style={{ height: "1800vh" }}>
                 <div className="hero-sticky">
@@ -413,23 +413,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">The Jewelry Edit</span>
                         </div>
-                        <h1 className="hero-title-bold" style={{ color: "var(--color-gold)" }}>
-                            A NEW<br />
-                            <span className="hero-title-stroke">VISION</span>
+                        <h1 className="hero-title-bold">
+                            <span style={{ color: "var(--color-gold)" }}>A NEW</span> <span style={{ color: "#ffffff" }}>VISION</span>
                         </h1>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Discover brilliance captured in precious metals and flawless stones.</p>
+                        <p className="hero-desc">Discover brilliance captured in precious metals and flawless stones.</p>
                     </div>
 
-                    <div ref={el => { textRefs2.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs2.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Craftsmanship</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            MASTER<br />
-                            <span className="hero-title-stroke">FORGED</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>MASTER</span> <span style={{ color: "#ffffff" }}>FORGED</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Every link and setting is carefully crafted by master jewelers.</p>
+                        <p className="hero-desc">Every link and setting is carefully crafted by master jewelers.</p>
                     </div>
 
                     <div ref={el => { textRefs2.current[2] = el; }} className="hero-text-overlay hero-text-right">
@@ -437,23 +435,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Materials</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            SOLID<br />
-                            <span className="hero-title-stroke">GOLD</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>SOLID</span> <span style={{ color: "#ffffff" }}>GOLD</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Forged from 18k solid gold that commands the room with its weight and warmth.</p>
+                        <p className="hero-desc">Forged from 18k solid gold that commands the room with its weight and warmth.</p>
                     </div>
 
-                    <div ref={el => { textRefs2.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs2.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Brilliance</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            RADIANT<br />
-                            <span className="hero-title-stroke">CUT</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>RADIANT</span> <span style={{ color: "#ffffff" }}>CUT</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Flawless stones that capture and multiply the light around you.</p>
+                        <p className="hero-desc">Flawless stones that capture and multiply the light around you.</p>
                     </div>
 
                     <div ref={el => { textRefs2.current[4] = el; }} className="hero-text-overlay hero-text-right">
@@ -461,23 +457,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Elegance</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            ETERNAL<br />
-                            <span className="hero-title-stroke">BEAUTY</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>ETERNAL</span> <span style={{ color: "#ffffff" }}>BEAUTY</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>A timeless statement that transcends generations and trends.</p>
+                        <p className="hero-desc">A timeless statement that transcends generations and trends.</p>
                     </div>
 
-                    <div ref={el => { textRefs2.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs2.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Details</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            INTRICATE<br />
-                            <span className="hero-title-stroke">DESIGN</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>INTRICATE</span> <span style={{ color: "#ffffff" }}>DESIGN</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>No facet is left untouched. Absolute perfection from every conceivable angle.</p>
+                        <p className="hero-desc">No facet is left untouched. Absolute perfection from every conceivable angle.</p>
                     </div>
 
                     <div ref={el => { textRefs2.current[6] = el; }} className="hero-text-overlay hero-text-right">
@@ -485,23 +479,21 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">Luxury</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            ULTIMATE<br />
-                            <span className="hero-title-stroke">SHINE</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>ULTIMATE</span> <span style={{ color: "#ffffff" }}>SHINE</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Wear your brilliance on your sleeve and illuminate every room you enter.</p>
+                        <p className="hero-desc">Wear your brilliance on your sleeve and illuminate every room you enter.</p>
                     </div>
 
-                    <div ref={el => { textRefs2.current[7] = el; }} className="hero-text-overlay hero-text-right pos-top-right text-align-right">
+                    <div ref={el => { textRefs2.current[7] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Excellence</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            PURE<br />
-                            <span className="hero-title-stroke">ELEGANCE</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>PURE</span> <span style={{ color: "#ffffff" }}>ELEGANCE</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>Adorn yourself in unmatched sophistication and grace.</p>
+                        <p className="hero-desc">Adorn yourself in unmatched sophistication and grace.</p>
                     </div>
 
                     <div ref={el => { textRefs2.current[8] = el; }} className="hero-text-overlay hero-text-right">
@@ -509,24 +501,22 @@ export default function Home() {
                             <div className="accent-bar"></div>
                             <span className="accent-label">The Peak</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            SUPREME<br />
-                            <span className="hero-title-stroke">CRAFT</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>SUPREME</span> <span style={{ color: "#ffffff" }}>CRAFT</span>
                         </h2>
-                        <p className="hero-desc" style={{ color: "#ffffff" }}>A culmination of artistic vision and master execution.</p>
+                        <p className="hero-desc">A culmination of artistic vision and master execution.</p>
                     </div>
 
-                    <div ref={el => { textRefs2.current[9] = el; }} className="hero-text-overlay text-last">
+                    <div ref={el => { textRefs2.current[9] = el; }} className="hero-text-overlay hero-text-right text-last">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
                             <span className="accent-label">Collection</span>
                         </div>
-                        <h2 className="hero-title-bold hero-title-md" style={{ color: "var(--color-gold)" }}>
-                            OWN THE<br />
-                            <span className="hero-title-stroke">LIGHT</span>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>OWN THE</span> <span style={{ color: "#ffffff" }}>LIGHT</span>
                         </h2>
                         <Link href={jewelleryCat ? `/categories/${jewelleryCat.id}` : "/categories"} className="hero-cta-pill">
-                            Explore {jewelleryCat?.name || "Jewelry"}
+                            Explore {jewelleryCat?.name || "Jewellery"}
                         </Link>
                     </div>
 
@@ -544,22 +534,25 @@ export default function Home() {
             </section>
 
             {/* ============================================================ */}
-            {/* JEWELRY PRODUCTS SHOWCASE                                    */}
+            {/* JEWELLERY PRODUCTS SHOWCASE                                  */}
             {/* ============================================================ */}
-            <section className="bg-black relative z-10" style={{ paddingTop: "6rem", paddingBottom: "8rem" }}>
-                <div className="w-full flex justify-center px-0 sm:px-6 lg:px-8">
+            <section className="bg-[#F8F6F0] relative z-10 text-[#1A1A1A] py-14 sm:py-20 md:py-28">
+                <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-7xl">
-                        <div className="flex flex-col items-center text-center mb-16">
-                            <div className="hero-accent-line justify-center mb-4">
-                                <span className="accent-label">Explore Category</span>
+                        <div className="flex flex-col items-center text-center mb-10 sm:mb-14 md:mb-16">
+                            <div className="hero-accent-line justify-center mb-3 sm:mb-4">
+                                <span className="accent-label" style={{ color: "#9c7d23" }}>Explore Category</span>
                             </div>
-                            <h2 className="hero-title-bold" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: "var(--color-gold)", marginBottom: "1rem" }}>
-                                THE JEWELRY<br />
-                                <span className="hero-title-stroke" style={{ fontSize: 'clamp(2.8rem, 5.5vw, 4.5rem)' }}>EDIT</span>
+                            <h2 className="hero-title-bold font-outfit text-center whitespace-normal sm:whitespace-nowrap" style={{ fontSize: 'clamp(1.6rem, 5.5vw, 3.2rem)', color: "#1A1A1A", marginBottom: "0.75rem" }}>
+                                <span style={{ color: "var(--color-gold)" }}>JEWELLERY</span> CATEGORY
                             </h2>
+                            <ExpandableCategoryDescription
+                                description={jewelleryCat?.description || "Explore timeless fine jewellery, radiant stones, and signature pieces crafted to illuminate every moment."}
+                                variant="light"
+                            />
                         </div>
 
-                        <div className="category-grid" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+                        <div className="category-grid">
                             {(jewelleryCat?.sub_categories && jewelleryCat.sub_categories.length > 0
                                 ? jewelleryCat.sub_categories
                                 : [
@@ -572,11 +565,10 @@ export default function Home() {
                                     ? `/categories/${jewelleryCat.id}/${sub.id}`
                                     : jewelleryCat ? `/categories/${jewelleryCat.id}` : "/shop";
                                 const img = sub.image_url || fallbackJewelleryImages[i % fallbackJewelleryImages.length];
-                                const floatClass = floatClasses[i % floatClasses.length];
                                 return (
-                                    <Link href={href} key={sub.id || i} className="category-card hover-float-parent">
+                                    <Link href={href} key={sub.id || i} className="category-card group bg-white shadow-sm border border-[#1A1A1A]/10">
                                         <div className="category-card-image">
-                                            <img src={img} alt={sub.name} loading="lazy" className={`floating-img ${floatClass}`} />
+                                            <img src={img} alt={sub.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                             <div className="category-card-gradient"></div>
                                             <div className="category-card-label" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', width: '100%', left: 0, right: 0 }}>
                                                 <h3 style={{ textAlign: 'center', margin: 0, width: '100%' }}>{sub.name}</h3>

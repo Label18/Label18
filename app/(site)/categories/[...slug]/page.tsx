@@ -4,6 +4,7 @@ import { getCategoriesTree, CategoryTree } from "@/lib/categories";
 import { getProducts } from "@/lib/supabase/products";
 import ProductFilters from "@/components/ProductFilters";
 import ProductCard from "@/components/ProductCard";
+import ExpandableCategoryDescription from "@/components/ExpandableCategoryDescription";
 
 export const revalidate = 300;
 
@@ -75,11 +76,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
               {currentName}
             </h1>
             {currentDescription && (
-              <p className="mt-8 font-outfit font-light text-[13px] md:text-[15px] tracking-[0.2em] uppercase text-white/80 max-w-2xl mx-auto leading-relaxed">
-                {currentDescription}
-              </p>
+              <ExpandableCategoryDescription
+                description={currentDescription}
+                variant="dark"
+                className="mt-6"
+              />
             )}
-            <p className="font-outfit font-light text-[11px] md:text-[12px] tracking-[0.2em] uppercase text-[#d4af37] mt-8">
+            <p className="font-outfit font-light text-[11px] md:text-[12px] tracking-[0.2em] uppercase text-[#d4af37] mt-6">
               {total} {total === 1 ? "piece" : "pieces"}
               {sp.q ? ` · matching "${sp.q}"` : ""}
             </p>
@@ -94,9 +97,11 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             {currentName}
           </h1>
           {currentDescription && (
-            <p className="mt-6 font-outfit font-light text-[12px] tracking-[0.2em] uppercase text-[#1A1A1A]/70 max-w-xl mx-auto">
-              {currentDescription}
-            </p>
+            <ExpandableCategoryDescription
+              description={currentDescription}
+              variant="light"
+              className="mt-4"
+            />
           )}
           <p className="font-outfit font-light text-[12px] tracking-[0.2em] uppercase text-[#1A1A1A]/40 mt-5">
             {total} {total === 1 ? "product" : "products"}
@@ -162,7 +167,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 No products found in this category.
               </p>
               <Link
-                href={`/categories/${slug.join("/")}`}
+                href={`/categories/${category.id}`}
                 className="inline-block mt-4 text-[11px] tracking-[0.2em] uppercase font-outfit font-medium text-[#9c7d23] hover:text-[#1A1A1A] transition-colors"
               >
                 Clear filters →
