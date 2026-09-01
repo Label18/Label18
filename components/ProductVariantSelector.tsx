@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { ProductVariation } from "@/lib/supabase/products";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "react-hot-toast";
 import WishlistButton from "@/components/WishlistButton";
 
 export default function ProductVariantSelector({
@@ -18,9 +19,9 @@ export default function ProductVariantSelector({
   selectedColorProp?: string | null;
   onColorChange?: (color: string | null) => void;
   onVariantChange?: (variant: ProductVariation | null) => void;
-  onRequireLogin?: () => void;
+  onRequireLogin?: (reason?: string) => void;
 }) {
-  const { user, addToCart, refreshCart } = useAuth();
+  const { user, addToCart, refreshCart, openLoginModal } = useAuth();
 
   const sizes = useMemo(
     () => [...new Set(variations.map((v) => v.size).filter(Boolean))] as string[],
@@ -77,13 +78,13 @@ export default function ProductVariantSelector({
     );
     if (match) return match;
 
-    if (selectedSize) {
-      match = variations.find((v) => v.size === selectedSize);
+    if (selectedColor) {
+      match = variations.find((v) => v.color === selectedColor);
       if (match) return match;
     }
 
-    if (selectedColor) {
-      match = variations.find((v) => v.color === selectedColor);
+    if (selectedSize) {
+      match = variations.find((v) => v.size === selectedSize);
       if (match) return match;
     }
 
@@ -120,7 +121,12 @@ export default function ProductVariantSelector({
     if (!activeVariation || !inStock) return;
 
     if (!user) {
-      onRequireLogin?.();
+      toast("Please login first to add to cart", { icon: "⚠️" });
+      if (onRequireLogin) {
+        onRequireLogin("Please sign in to add items to your shopping bag.");
+      } else {
+        openLoginModal("Please sign in to add items to your shopping bag.");
+      }
       return;
     }
 
@@ -150,7 +156,7 @@ export default function ProductVariantSelector({
           <>
             <p
               className="font-normal text-3xl text-[#9c7d23]"
-              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+             
             >
               ₹{displayPrice.toLocaleString()}
             </p>
@@ -163,7 +169,7 @@ export default function ProductVariantSelector({
         ) : priceRange ? (
           <p
             className="font-normal text-3xl text-[#9c7d23]"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             {priceRange.min === priceRange.max
               ? `₹${priceRange.min.toLocaleString()}`
@@ -172,7 +178,7 @@ export default function ProductVariantSelector({
         ) : (
           <p
             className="font-normal text-3xl text-[#9c7d23]"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Select Options
           </p>
@@ -184,7 +190,7 @@ export default function ProductVariantSelector({
         <div>
           <label
             className="block text-[10.5px] tracking-[0.3em] uppercase text-[#1A1A1A]/60 font-outfit font-medium mb-3"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Color{selectedColor ? `: ${selectedColor}` : ""}
           </label>
@@ -214,7 +220,7 @@ export default function ProductVariantSelector({
         <div>
           <label
             className="block text-[10.5px] tracking-[0.3em] uppercase text-[#1A1A1A]/60 font-outfit font-medium mb-3"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Size
           </label>
@@ -242,7 +248,7 @@ export default function ProductVariantSelector({
       {/* Stock Status */}
       <p
         className="text-[10px] tracking-[0.25em] uppercase font-outfit font-medium text-[#1A1A1A]/60"
-        style={{ fontFamily: '"Times New Roman", Times, serif' }}
+       
       >
         {activeVariation
           ? inStock
@@ -267,7 +273,7 @@ export default function ProductVariantSelector({
               ? "bg-[#1A1A1A] text-[#F8F6F0] hover:bg-[#9c7d23] hover:text-white"
               : "bg-[#1A1A1A]/10 text-[#1A1A1A]/30 cursor-not-allowed"
           } ${adding ? "opacity-70 cursor-wait" : ""}`}
-          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+         
         >
           {added
             ? "Added to Cart ✓"

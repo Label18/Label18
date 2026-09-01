@@ -22,7 +22,7 @@ export default async function PosHistoryPage() {
   if (error) {
     return (
       <div
-        className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-sans text-black"
+        className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-outfit text-black"
         style={{ colorScheme: 'light' }}
       >
         <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-600">
@@ -34,7 +34,7 @@ export default async function PosHistoryPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-sans text-black"
+      className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-outfit text-black"
       style={{ colorScheme: 'light' }}
     >
       <HistoryClient orders={(data ?? []) as PosOrder[]} />

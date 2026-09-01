@@ -30,7 +30,7 @@ export default function CategoryAccordionMobile({
               onClick={() =>
                 setOpenCategory(isCategoryOpen ? null : category.id)
               }
-              className="w-full flex items-center justify-between py-3 text-white/70 hover:text-[#d4af37] transition-colors font-outfit font-light text-[12px] tracking-[0.2em] uppercase"
+              className="w-full flex items-center justify-between py-3 text-white/95 hover:text-[#d4af37] transition-colors font-outfit font-normal text-[12px] tracking-[0.2em] uppercase"
             >
               {category.sub_categories.length > 0 ? (
                 <>
@@ -76,7 +76,7 @@ export default function CategoryAccordionMobile({
                       onClick={() =>
                         setOpenSubCategory(isSubOpen ? null : sub.id)
                       }
-                      className="w-full flex items-center justify-between py-2 text-white/60 hover:text-[#d4af37] transition-colors font-outfit font-light text-[11px] tracking-[0.15em] uppercase"
+                      className="w-full flex items-center justify-between py-2 text-white/95 hover:text-[#d4af37] transition-colors font-outfit font-normal text-[11px] tracking-[0.15em] uppercase"
                     >
                       {sub.sub_sub_categories.length > 0 ? (
                         <>
@@ -119,7 +119,7 @@ export default function CategoryAccordionMobile({
                           key={subSub.id}
                           href={`/categories/${category.id}/${sub.id}/${subSub.id}`}
                           onClick={onNavigate}
-                          className="block pl-4 py-1.5 text-white/50 hover:text-[#d4af37] transition-colors font-outfit font-light text-[10.5px] tracking-[0.12em] uppercase"
+                          className="block pl-4 py-1.5 text-white/95 hover:text-[#d4af37] transition-colors font-outfit font-normal text-[10.5px] tracking-[0.12em] uppercase"
                         >
                           {subSub.name}
                         </Link>

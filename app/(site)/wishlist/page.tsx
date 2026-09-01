@@ -108,7 +108,7 @@ export default function WishlistPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Your Wishlist
           </h1>
@@ -131,7 +131,7 @@ export default function WishlistPage() {
       <div className="max-w-[1400px] mx-auto">
         <h1
           className="text-2xl md:text-3xl uppercase tracking-[0.15em] mb-10"
-          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+         
         >
           Your Wishlist
         </h1>
@@ -214,7 +214,7 @@ export default function WishlistPage() {
                     {price !== null && (
                       <p
                         className="text-base font-outfit font-medium text-[#9c7d23] mt-2"
-                        style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                       
                       >
                         ₹{price.toLocaleString()}
                       </p>

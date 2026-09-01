@@ -47,57 +47,127 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   });
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const currentName = subSubCategory?.name ?? subCategory?.name ?? category.name;
+  const currentCategoryNode = subSubCategory ?? subCategory ?? category;
+  const currentName = currentCategoryNode.name;
+  const currentImage = currentCategoryNode.image_url;
+  const currentDescription = currentCategoryNode.description;
 
   return (
-    <main className="min-h-screen bg-black pt-32 md:pt-40 pb-24 px-6 lg:px-10">
-      <div className="max-w-7xl mx-auto">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 mb-6 text-[10.5px] tracking-[0.15em] uppercase font-outfit font-light text-white/40 flex-wrap">
-          <Link href="/" className="hover:text-[#d4af37] transition-colors">Home</Link>
-          <span>/</span>
-          <Link
-            href={`/categories/${category.id}`}
-            className={`hover:text-[#d4af37] transition-colors ${!subCategory ? "text-[#d4af37]" : ""}`}
+    <main className="min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pb-24 selection:bg-[#9c7d23]/30 selection:text-[#1A1A1A]">
+      {/* Category Hero Banner */}
+      {currentImage ? (
+        <div className="relative w-full h-[50vh] md:h-[60vh] flex items-center justify-center mb-16 overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
+            style={{ backgroundImage: `url(${currentImage})` }}
           >
-            {category.name}
-          </Link>
-          {subCategory && (
-            <>
+            {/* Dark gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-black/60 bg-gradient-to-t from-black/80 via-black/40 to-black/60"></div>
+          </div>
+          
+          {/* Content */}
+          <div className="relative z-10 text-center px-6 mt-16 max-w-4xl">
+            <span className="font-outfit font-light text-[10px] md:text-[12px] tracking-[0.5em] uppercase text-[#d4af37] mb-6 block drop-shadow-md">
+              Collection
+            </span>
+            <h1 className="font-outfit font-light text-5xl md:text-7xl lg:text-8xl text-white tracking-widest uppercase drop-shadow-lg">
+              {currentName}
+            </h1>
+            {currentDescription && (
+              <p className="mt-8 font-outfit font-light text-[13px] md:text-[15px] tracking-[0.2em] uppercase text-white/80 max-w-2xl mx-auto leading-relaxed">
+                {currentDescription}
+              </p>
+            )}
+            <p className="font-outfit font-light text-[11px] md:text-[12px] tracking-[0.2em] uppercase text-[#d4af37] mt-8">
+              {total} {total === 1 ? "piece" : "pieces"}
+              {sp.q ? ` · matching "${sp.q}"` : ""}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="pt-32 md:pt-40 mb-14 text-center px-6">
+          <span className="font-outfit font-light text-[10px] tracking-[0.5em] uppercase text-[#9c7d23] mb-4 block">
+            Category
+          </span>
+          <h1 className="font-outfit font-light text-4xl md:text-6xl text-[#1A1A1A] tracking-widest uppercase">
+            {currentName}
+          </h1>
+          {currentDescription && (
+            <p className="mt-6 font-outfit font-light text-[12px] tracking-[0.2em] uppercase text-[#1A1A1A]/70 max-w-xl mx-auto">
+              {currentDescription}
+            </p>
+          )}
+          <p className="font-outfit font-light text-[12px] tracking-[0.2em] uppercase text-[#1A1A1A]/40 mt-5">
+            {total} {total === 1 ? "product" : "products"}
+            {sp.q ? ` · matching "${sp.q}"` : ""}
+          </p>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-16">
+        {/* Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="mb-8">
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 font-outfit font-medium text-[11px] tracking-[0.15em] uppercase text-[#1A1A1A]/70">
+            <li className="flex items-center gap-x-2">
+              <Link href="/" className="hover:text-[#9c7d23] transition-colors">Home</Link>
+            </li>
+            <li className="flex items-center gap-x-2">
               <span>/</span>
               <Link
-                href={`/categories/${category.id}/${subCategory.id}`}
-                className={`hover:text-[#d4af37] transition-colors ${!subSubCategory ? "text-[#d4af37]" : ""}`}
+                href={`/categories/${category.id}`}
+                className={`hover:text-[#9c7d23] transition-colors ${!subCategory ? "text-[#1A1A1A]" : ""}`}
               >
-                {subCategory.name}
+                {category.name}
               </Link>
-            </>
-          )}
-          {subSubCategory && (
-            <>
-              <span>/</span>
-              <span className="text-[#d4af37]">{subSubCategory.name}</span>
-            </>
-          )}
+            </li>
+            {subCategory && (
+              <li className="flex items-center gap-x-2">
+                <span>/</span>
+                <Link
+                  href={`/categories/${category.id}/${subCategory.id}`}
+                  className={`hover:text-[#9c7d23] transition-colors ${!subSubCategory ? "text-[#1A1A1A]" : ""}`}
+                >
+                  {subCategory.name}
+                </Link>
+              </li>
+            )}
+            {subSubCategory && (
+              <li className="flex items-center gap-x-2">
+                <span>/</span>
+                <span className="text-[#1A1A1A]">{subSubCategory.name}</span>
+              </li>
+            )}
+          </ol>
         </nav>
+        {/* Filters Top Bar */}
+        <div className="mb-10 w-full">
+          <div className="rounded-2xl bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-4 md:p-6 shadow-sm">
+            <ProductFilters
+              categories={categories}
+              initialCategoryId={category.id}
+              initialSubCategoryId={subCategory?.id}
+              initialSubSubCategoryId={subSubCategory?.id}
+              basePath="/categories"
+              hideCategoryDropdown={true}
+            />
+          </div>
+        </div>
 
-        <div className="flex flex-col lg:flex-row gap-10">
-          <ProductFilters categories={categories} />
-
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-8">
-              <h1 className="font-outfit font-light text-2xl tracking-[0.15em] uppercase text-white">
-                {currentName}
-              </h1>
-              <span className="text-white/40 text-[11px] tracking-[0.15em] uppercase font-outfit font-light">
-                {total} products
-              </span>
-            </div>
-
-            {items.length === 0 ? (
-              <p className="text-white/50 font-outfit font-light text-[13px]">
+        {/* Results */}
+        <div className="w-full">
+          {items.length === 0 ? (
+            <div className="text-center py-24 rounded-xl bg-white border border-[#1A1A1A]/10">
+              <p className="font-outfit font-medium text-[13px] tracking-[0.1em] uppercase text-[#1A1A1A]/70">
                 No products found in this category.
               </p>
+              <Link
+                href={`/categories/${slug.join("/")}`}
+                className="inline-block mt-4 text-[11px] tracking-[0.2em] uppercase font-outfit font-medium text-[#9c7d23] hover:text-[#1A1A1A] transition-colors"
+              >
+                Clear filters →
+              </Link>
+            </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
                 {items.map((product) => (
@@ -107,17 +177,18 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             )}
 
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-12">
+              <div className="flex items-center justify-center gap-3 mt-14">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
                   const qp = new URLSearchParams({ ...sp, page: String(p) } as any);
+                  const isActive = p === page;
                   return (
                     <Link
                       key={p}
                       href={`/categories/${slug.join("/")}?${qp.toString()}`}
-                      className={`text-[12px] font-outfit font-light w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
-                        p === page
-                          ? "bg-[#d4af37] text-black"
-                          : "text-white/60 hover:text-[#d4af37] border border-white/10"
+                      className={`text-[12px] font-outfit font-medium w-9 h-9 flex items-center justify-center rounded-full transition-colors ${
+                        isActive
+                          ? "bg-[#9c7d23] text-white"
+                          : "text-[#1A1A1A]/60 hover:text-[#9c7d23] border border-[#1A1A1A]/10 bg-white"
                       }`}
                     >
                       {p}
@@ -128,7 +199,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             )}
           </div>
         </div>
-      </div>
-    </main>
-  );
-}
+      </main>
+    );
+  }

@@ -13,7 +13,7 @@ interface LoginModalProps {
 type Mode = "login" | "register";
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, loginPrompt } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,17 +66,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setShowPassword(false);
   };
 
-  const switchMode = (m: Mode) => {
-    setMode(m);
-    resetForm();
+  const switchMode = (newMode: Mode) => {
+    setError(null);
+    setSuccess(null);
+    setMode(newMode);
   };
 
   const handleClose = () => {
     setVisible(false);
     setTimeout(() => {
       resetForm();
+      setMode("login");
       onClose();
-    }, 200);
+    }, 250);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,6 +88,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setLoading(true);
 
     if (mode === "login") {
+      if (!email.trim() || !password) {
+        setLoading(false);
+        setError("Please enter both email and password.");
+        return;
+      }
       const { error } = await signIn(email, password);
       setLoading(false);
       if (error) {
@@ -142,7 +149,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
         <div className="px-8 pt-10 pb-9 sm:px-10">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-5">
             <div className="relative w-16 h-16 rounded-full ring-1 ring-[#d4af37]/30 p-[2px]">
               <div className="w-full h-full rounded-full overflow-hidden bg-black">
                 <Image
@@ -156,6 +163,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
             </div>
           </div>
+
+          {/* Contextual Login Banner */}
+          {loginPrompt && (
+            <div className="mb-5 flex items-center justify-center gap-2 rounded-xl border border-[#d4af37]/30 bg-[#d4af37]/10 px-3.5 py-2.5 text-center">
+              <span className="text-[11.5px] font-outfit font-medium tracking-wide text-[#d4af37]">
+                {loginPrompt}
+              </span>
+            </div>
+          )}
 
           {/* Heading */}
           <h2 className="text-center font-outfit font-light text-white text-xl tracking-[0.1em] mb-1">

@@ -61,7 +61,6 @@ export default function OrdersPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             My Orders
           </h1>
@@ -109,7 +108,6 @@ export default function OrdersPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             My Orders
           </h1>
@@ -119,7 +117,6 @@ export default function OrdersPage() {
           <Link
             href="/shop"
             className="inline-block px-8 py-3 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             Continue Shopping
           </Link>
@@ -137,7 +134,6 @@ export default function OrdersPage() {
           </p>
           <h1
             className="text-2xl md:text-3xl uppercase tracking-[0.1em] mb-2"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             My Orders
           </h1>
@@ -177,7 +173,6 @@ export default function OrdersPage() {
                     </span>
                     <p
                       className="text-sm font-outfit font-medium whitespace-nowrap"
-                      style={{ fontFamily: '"Times New Roman", Times, serif' }}
                     >
                       ₹{Number(order.total).toLocaleString()}
                     </p>

@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Address, getAddresses, addAddress, AddressInput } from "@/lib/supabase/addresses";
 import AddressForm from "@/components/AddressForm";
+import { decreaseStockForOrder } from "@/app/(site)/checkout/actions";
 
 type CartRow = {
   id: string;
@@ -164,11 +165,17 @@ export default function CheckoutPage() {
     setPlaceError(null);
     setPlacing(true);
     try {
+      const itemsToDeduct = items.map((i) => ({
+        variation_id: i.variation_id,
+        quantity: i.quantity,
+      }));
+
       const { data: orderId, error } = await supabase.rpc("place_order", {
         p_address_id: selectedAddressId,
         p_coupon_code: appliedCoupon,
       });
       if (error) throw error;
+
       router.push(`/orders/${orderId}`);
     } catch (err: any) {
       setPlaceError(err?.message ?? "Couldn't place your order. Please try again.");
@@ -183,7 +190,7 @@ export default function CheckoutPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Checkout
           </h1>
@@ -206,7 +213,7 @@ export default function CheckoutPage() {
       <div className="max-w-[1100px] mx-auto">
         <h1
           className="text-2xl md:text-3xl uppercase tracking-[0.15em] mb-10"
-          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+         
         >
           Checkout
         </h1>
@@ -226,7 +233,7 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h2
                     className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23]"
-                    style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                   
                   >
                     Shipping Address
                   </h2>
@@ -288,7 +295,7 @@ export default function CheckoutPage() {
               <div>
                 <h2
                   className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-4"
-                  style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                 
                 >
                   Items ({items.length})
                 </h2>
@@ -330,7 +337,7 @@ export default function CheckoutPage() {
               <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg p-6 sticky top-28">
                 <h2
                   className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-5"
-                  style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                 
                 >
                   Order Summary
                 </h2>
@@ -374,7 +381,7 @@ export default function CheckoutPage() {
                 <div className="space-y-2 text-sm font-outfit font-light border-t border-[#1A1A1A]/10 pt-4">
                   <div className="flex justify-between">
                     <span className="text-[#1A1A1A]/60">Subtotal</span>
-                    <span>₹{subtotal.toLocaleString()}</span>
+                    <span className="font-bold text-red-600">₹{subtotal.toLocaleString()}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-[#9c7d23]">
@@ -384,7 +391,7 @@ export default function CheckoutPage() {
                   )}
                   <div className="flex justify-between text-base font-medium pt-2 border-t border-[#1A1A1A]/10">
                     <span>Total</span>
-                    <span>₹{total.toLocaleString()}</span>
+                    <span className="font-bold text-red-600">₹{total.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -396,7 +403,7 @@ export default function CheckoutPage() {
                   onClick={handlePlaceOrder}
                   disabled={placing || !selectedAddressId}
                   className="w-full mt-6 py-4 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all disabled:opacity-50"
-                  style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                 
                 >
                   {placing ? "Placing Order..." : "Place Order"}
                 </button>

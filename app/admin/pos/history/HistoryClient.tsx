@@ -294,7 +294,7 @@ export default function HistoryClient({ orders }: { orders: PosOrder[] }) {
                                                 />
                                             </button>
                                         </td>
-                                        <td className="px-6 py-3.5 font-mono text-xs text-stone-600">
+                                        <td className="px-6 py-3.5 font-outfit text-xs text-stone-600">
                                             {o.order_number}
                                         </td>
                                         <td className="px-6 py-3.5 text-stone-600">
@@ -350,7 +350,7 @@ export default function HistoryClient({ orders }: { orders: PosOrder[] }) {
                                                     <tbody>
                                                         {o.items.map((item) => (
                                                             <tr key={item.id} className="border-t border-stone-100">
-                                                                <td className="px-6 py-2.5 font-mono text-xs text-stone-600">
+                                                                <td className="px-6 py-2.5 font-outfit text-xs text-stone-600">
                                                                     {item.sku}
                                                                 </td>
                                                                 <td className="px-6 py-2.5 text-stone-700">{item.product_name}</td>

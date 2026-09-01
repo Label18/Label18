@@ -218,7 +218,7 @@ function VariationsPanel({ variations }: { variations: Variation[] }) {
                   </div>
                 )}
               </td>
-              <td className="px-6 py-2.5 font-mono text-xs text-stone-600">{v.sku || '—'}</td>
+              <td className="px-6 py-2.5 font-outfit text-xs text-stone-600">{v.sku || '—'}</td>
               <td className="px-6 py-2.5 text-stone-700">{v.size || '—'}</td>
               <td className="px-6 py-2.5">
                 <span className="flex items-center gap-2 text-stone-700">
@@ -536,7 +536,7 @@ export default function ProductsListClient({ products }: { products: ProductRow[
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-3.5 font-mono text-xs text-stone-600">{p.sku}</td>
+                    <td className="px-6 py-3.5 font-outfit text-xs text-stone-600">{p.sku}</td>
                     <td className="px-6 py-3.5 font-semibold text-black">{p.name}</td>
                     <td className="px-6 py-3.5 text-stone-600">{p.category?.name || '—'}</td>
                     <td className="px-6 py-3.5 text-stone-600">{p.sub_category?.name || '—'}</td>

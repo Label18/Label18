@@ -22,7 +22,7 @@ export default async function AddProductPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-sans text-black"
+      className="min-h-screen bg-[#FAF7F1] px-10 py-10 font-outfit text-black"
       style={{ colorScheme: 'light' }}
     >
       <ProductForm

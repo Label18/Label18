@@ -6,16 +6,23 @@ import ProductVariantSelector from "@/components/ProductVariantSelector";
 import { Product, ProductVariation } from "@/lib/supabase/products";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function ProductDetailClient({ product }: { product: Product }) {
+export default function ProductDetailClient({ product, initialColor }: { product: Product, initialColor?: string | null }) {
   const { openLoginModal } = useAuth();
 
   const variations = product.product_variations ?? [];
 
-  const firstColor = variations.find((v) => v.color)?.color ?? null;
+  const firstColor = initialColor || (variations.find((v) => v.color)?.color ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(firstColor);
-  const [activeVariation, setActiveVariation] = useState<ProductVariation | null>(
-    variations[0] ?? null
-  );
+  
+  const initialVariation = useMemo(() => {
+    if (initialColor) {
+      const match = variations.find(v => v.color === initialColor);
+      if (match) return match;
+    }
+    return variations[0] ?? null;
+  }, [initialColor, variations]);
+
+  const [activeVariation, setActiveVariation] = useState<ProductVariation | null>(initialVariation);
 
   const images = useMemo(() => {
     const list: { src: string; color: string | null }[] = [];
@@ -35,7 +42,13 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     return list;
   }, [product, variations]);
 
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const initialImageIndex = useMemo(() => {
+    if (!firstColor) return 0;
+    const idx = images.findIndex((img) => img.color === firstColor);
+    return idx !== -1 ? idx : 0;
+  }, [images, firstColor]);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(initialImageIndex);
 
   const handleColorChange = useCallback((color: string | null) => {
     setSelectedColor((prev) => (prev === color ? prev : color));
@@ -124,11 +137,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
           {/* Right Column: Title & Selector */}
           <div className="lg:col-span-5 bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-8 md:p-10 rounded-lg shadow-sm">
-            <p className="text-[10.5px] tracking-[0.4em] uppercase font-outfit font-medium text-[#9c7d23] mb-2" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <p className="text-[10.5px] tracking-[0.4em] uppercase font-outfit font-medium text-[#9c7d23] mb-2">
               SKU: {product.sku}
             </p>
 
-            <h1 className="font-normal text-3xl md:text-4xl tracking-[0.05em] uppercase text-[#1A1A1A] mb-6" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <h1 className="font-normal text-3xl md:text-4xl tracking-[0.05em] uppercase text-[#1A1A1A] mb-6">
               {product.name}
             </h1>
 
@@ -157,7 +170,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             {/* Description Box */}
             {product.description && (
               <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-6 md:p-8 rounded-lg shadow-sm">
-                <h2 className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-3" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                <h2 className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-3">
                   Description
                 </h2>
                 <p className="text-[#1A1A1A]/80 font-outfit font-light text-sm leading-[1.9] tracking-wide whitespace-pre-line">
@@ -168,11 +181,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             {/* Active Reference Box */}
             <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-6 md:p-8 rounded-lg shadow-sm flex justify-between items-center">
-              <span className="text-[10px] tracking-[0.3em] uppercase font-outfit font-medium text-[#1A1A1A]/50" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+              <span className="text-[10px] tracking-[0.3em] uppercase font-outfit font-medium text-[#1A1A1A]/50">
                 Active Reference
               </span>
-              <span className="text-[11px] tracking-[0.2em] uppercase font-outfit font-medium text-[#9c7d23]" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                {activeVariation?.sku || product.sku}
+              <span className="text-[11px] tracking-[0.2em] uppercase font-outfit font-medium text-[#9c7d23]">
+                {(activeVariation as any)?.sku || product.sku}
               </span>
             </div>
 

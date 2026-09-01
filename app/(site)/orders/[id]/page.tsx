@@ -92,7 +92,6 @@ export default function OrderDetailPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             Order Details
           </h1>
@@ -152,7 +151,6 @@ export default function OrderDetailPage() {
           </p>
           <h1
             className="text-2xl md:text-3xl uppercase tracking-[0.1em] mb-2"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             Thank You
           </h1>
@@ -167,7 +165,6 @@ export default function OrderDetailPage() {
             <div>
               <h2
                 className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-4"
-                style={{ fontFamily: '"Times New Roman", Times, serif' }}
               >
                 Items
               </h2>
@@ -204,7 +201,6 @@ export default function OrderDetailPage() {
                     </div>
                     <p
                       className="text-sm font-outfit font-medium text-[#9c7d23] whitespace-nowrap"
-                      style={{ fontFamily: '"Times New Roman", Times, serif' }}
                     >
                       ₹{Number(item.line_total).toLocaleString()}
                     </p>
@@ -216,7 +212,6 @@ export default function OrderDetailPage() {
             <div>
               <h2
                 className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-4"
-                style={{ fontFamily: '"Times New Roman", Times, serif' }}
               >
                 Shipping Address
               </h2>
@@ -237,7 +232,6 @@ export default function OrderDetailPage() {
             <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg p-6 sticky top-28">
               <h2
                 className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-5"
-                style={{ fontFamily: '"Times New Roman", Times, serif' }}
               >
                 Order Summary
               </h2>
@@ -277,7 +271,6 @@ export default function OrderDetailPage() {
               <Link
                 href="/shop"
                 className="block w-full mt-3 py-3.5 rounded bg-[#1A1A1A] text-[#F8F6F0] text-center text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all"
-                style={{ fontFamily: '"Times New Roman", Times, serif' }}
               >
                 Continue Shopping
               </Link>

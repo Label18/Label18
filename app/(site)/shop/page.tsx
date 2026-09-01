@@ -98,46 +98,52 @@ export default async function ShopPage({
   });
 
   return (
-    <main className="min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pt-32 md:pt-40 pb-24 px-6 lg:px-16 selection:bg-[#9c7d23]/30 selection:text-[#1A1A1A]">
-      <div className="max-w-7xl mx-auto">
-        <Breadcrumbs crumbs={crumbs} />
-
-        {/* Header */}
-        <div className="text-center mb-14">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent to-[#9c7d23]/50 mx-auto mb-6" />
-          <span className="font-outfit font-light text-[10px] tracking-[0.5em] uppercase text-[#9c7d23] mb-4 block">
+    <main className="min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pb-24 selection:bg-[#9c7d23]/30 selection:text-[#1A1A1A]">
+      {/* Hero Banner */}
+      <div 
+        className="relative w-full h-[45vh] min-h-[360px] flex items-center justify-center mb-14 overflow-hidden bg-cover bg-center"
+        style={{ 
+          backgroundImage: `url('https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop')` 
+        }}
+      >
+        {/* Overlays */}
+        <div className="absolute inset-0 bg-black/45"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#F8F6F0] via-transparent to-black/30"></div>
+        <div className="absolute inset-0 opacity-25 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#d4af37] via-transparent to-transparent"></div>
+        
+        {/* Clean Serif Editorial Typography (Non-Italic) */}
+        <div className="relative z-10 text-center px-6 pt-10 max-w-3xl flex flex-col items-center justify-center h-full w-full">
+          <span className="font-outfit font-light text-[10px] md:text-[11px] tracking-[0.4em] uppercase text-[#d4af37] mb-3 block drop-shadow-md">
             The Collection
           </span>
-          <h1
-            className="font-normal text-4xl md:text-6xl text-[#1A1A1A] tracking-widest uppercase"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
-          >
-            Shop{" "}
-            <span
-              className="text-[#9c7d23] italic font-normal tracking-normal lowercase"
-              style={{ fontFamily: '"Times New Roman", Times, serif' }}
-            >
-              the edit
-            </span>
+          <h1 className="font-serif font-light text-3xl md:text-5xl lg:text-6xl text-white tracking-wide drop-shadow-xl">
+            Shop The Edit
           </h1>
-          <p className="font-outfit font-light text-[12px] tracking-[0.2em] uppercase text-[#1A1A1A]/40 mt-5">
-            {total} {total === 1 ? "product" : "products"}
+          <div className="w-10 h-[1px] bg-[#d4af37]/70 my-4"></div>
+          <p className="font-outfit font-light text-[11px] md:text-[12px] tracking-[0.2em] uppercase text-white/90 max-w-lg mx-auto leading-relaxed drop-shadow">
+            Explore our complete collection of premium fashion and timeless jewelry
+          </p>
+          <p className="font-outfit font-light text-[10px] md:text-[11px] tracking-[0.2em] uppercase text-[#d4af37] mt-4 drop-shadow-md">
+            {total} {total === 1 ? "piece" : "pieces"}
             {params.q ? ` · matching "${params.q}"` : ""}
           </p>
         </div>
+      </div>
 
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Filters rail */}
-          <aside className="lg:w-64 shrink-0">
-            <div className="rounded-xl bg-white border border-[#1A1A1A]/10 p-5">
-              <ProductFilters categories={categories} />
-            </div>
-          </aside>
+      <div className="max-w-7xl mx-auto px-6 lg:px-16">
+        <Breadcrumbs crumbs={crumbs} />
 
-          {/* Results */}
-          <div className="flex-1">
-            {items.length === 0 ? (
-              <div className="text-center py-24 rounded-xl bg-white border border-[#1A1A1A]/10">
+        {/* Filters Top Bar */}
+        <div className="mb-10 w-full">
+          <div className="rounded-2xl bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-4 md:p-6 shadow-sm">
+            <ProductFilters categories={categories} />
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="w-full">
+          {items.length === 0 ? (
+            <div className="text-center py-24 rounded-xl bg-white border border-[#1A1A1A]/10">
                 <p className="font-outfit font-light text-[13px] tracking-[0.1em] uppercase text-[#1A1A1A]/50">
                   No products match these filters.
                 </p>
@@ -180,7 +186,6 @@ export default async function ShopPage({
             )}
           </div>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+    );
 }

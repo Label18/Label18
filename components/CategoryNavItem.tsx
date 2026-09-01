@@ -53,7 +53,7 @@ export default function CategoryNavItem({
     >
       <Link
         href={`/categories/${category.id}`}
-        className="group relative flex items-center gap-1 text-white/70 hover:text-[#d4af37] transition-colors duration-300 font-outfit font-light text-[11px] tracking-[0.25em] uppercase py-2 whitespace-nowrap"
+        className="group relative flex items-center gap-1 text-white hover:text-[#d4af37] transition-colors duration-300 font-outfit font-medium text-[11px] tracking-[0.25em] uppercase py-2 whitespace-nowrap"
       >
         {category.name}
         {hasSubCategories && (
@@ -74,7 +74,7 @@ export default function CategoryNavItem({
             />
           </svg>
         )}
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-[#d4af37] transition-all duration-500 ease-out group-hover:w-full opacity-70"></span>
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-[#d4af37] transition-all duration-500 ease-out group-hover:w-full opacity-80"></span>
       </Link>
 
       {/* Dropdown: sub-categories, with sub-sub-categories flyout on hover */}

@@ -5,6 +5,7 @@ export type SubSubCategory = {
   name: string;
   priority: number;
   image_url?: string | null;
+  description?: string | null;
 };
 
 export type SubCategory = {
@@ -12,6 +13,7 @@ export type SubCategory = {
   name: string;
   priority: number;
   image_url?: string | null;
+  description?: string | null;
   sub_sub_categories: SubSubCategory[];
 };
 
@@ -20,16 +22,13 @@ export type CategoryTree = {
   name: string;
   priority: number;
   image_url?: string | null;
+  description?: string | null;
   sub_categories: SubCategory[];
 };
 
 /**
  * Fetches the full visible category -> sub_category -> sub_sub_category tree,
  * sorted by `priority` at every level. Only rows with is_visible = true are returned.
- *
- * Nested `.order()` calls in supabase-js only reliably sort the top level when the
- * relation is 2+ levels deep, so we sort sub_categories / sub_sub_categories again
- * on the client to guarantee priority order everywhere.
  */
 export async function getCategoriesTree(): Promise<CategoryTree[]> {
   const supabase = createClient();
@@ -43,18 +42,21 @@ export async function getCategoriesTree(): Promise<CategoryTree[]> {
       priority,
       is_visible,
       image_url,
+      description,
       sub_categories (
         id,
         name,
         priority,
         is_visible,
         image_url,
+        description,
         sub_sub_categories (
           id,
           name,
           priority,
           is_visible,
-          image_url
+          image_url,
+          description
         )
       )
     `

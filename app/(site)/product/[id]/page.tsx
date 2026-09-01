@@ -9,10 +9,13 @@ export const revalidate = 60;
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 };
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const sp = await searchParams;
+  const initialColor = sp.color || null;
 
   const product = await getProductById(id);
   if (!product) notFound();
@@ -33,7 +36,7 @@ export default async function ProductPage({ params }: Props) {
       <div className="max-w-[1400px] mx-auto">
         
         {/* Luxury Breadcrumbs */}
-        <nav className="flex items-center gap-2.5 mb-8 text-[10px] tracking-[0.3em] uppercase font-outfit font-medium text-[#1A1A1A]/50 flex-wrap" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+        <nav className="flex items-center gap-2.5 mb-8 text-[10px] tracking-[0.3em] uppercase font-outfit font-medium text-[#1A1A1A]/50 flex-wrap">
           <Link href="/" className="hover:text-[#9c7d23] transition-colors">Home</Link>
           {category && (
             <>
@@ -63,17 +66,17 @@ export default async function ProductPage({ params }: Props) {
         </nav>
 
         {/* Product Details, Image Gallery & Variations Client Component */}
-        <ProductDetailClient product={product} />
+        <ProductDetailClient product={product} initialColor={initialColor} />
 
         {/* Related Products Section (Optimized spacing top and bottom) */}
         {related.length > 0 && (
           <div className="mt-16 pt-12 border-t border-[#1A1A1A]/15">
             <div className="flex flex-col items-center text-center mb-10">
-              <span className="font-outfit font-medium text-[10.5px] tracking-[0.4em] uppercase text-[#9c7d23] mb-2.5" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+              <span className="font-outfit font-medium text-[10.5px] tracking-[0.4em] uppercase text-[#9c7d23] mb-2.5">
                 Curated For You
               </span>
-              <h2 className="text-2xl md:text-3xl font-normal text-[#1A1A1A] tracking-widest" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                YOU MAY ALSO <span className="text-[#9c7d23] italic font-normal tracking-normal">LIKE</span>
+              <h2 className="text-2xl md:text-3xl font-normal text-[#1A1A1A] tracking-widest">
+                YOU MAY ALSO <span className="text-[#9c7d23]">LIKE</span>
               </h2>
             </div>
 

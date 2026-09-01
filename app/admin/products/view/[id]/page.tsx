@@ -57,9 +57,9 @@ export default async function ViewProductPage({ params }: { params: Promise<{ id
             <h1 className="text-2xl font-bold text-black">{product.name}</h1>
             <p className="mt-1 font-mono text-sm text-stone-500">{product.sku}</p>
             <p className="mt-2 text-sm text-stone-600">
-              {product.category?.name}
-              {product.sub_category?.name ? ` › ${product.sub_category.name}` : ''}
-              {product.sub_sub_category?.name ? ` › ${product.sub_sub_category.name}` : ''}
+              {(product.category as any)?.name}
+              {(product.sub_category as any)?.name ? ` › ${(product.sub_category as any).name}` : ''}
+              {(product.sub_sub_category as any)?.name ? ` › ${(product.sub_sub_category as any).name}` : ''}
             </p>
             <span
               className={`mt-3 inline-block rounded-full px-2.5 py-1 text-[11px] font-medium ${

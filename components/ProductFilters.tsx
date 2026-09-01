@@ -1,152 +1,200 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { CategoryTree } from "@/lib/supabase/categories";
+import { CategoryTree } from "@/lib/categories";
 
-export default function ProductFilters({ categories }: { categories: CategoryTree[] }) {
+export default function ProductFilters({
+  categories,
+  initialCategoryId,
+  initialSubCategoryId,
+  initialSubSubCategoryId,
+  basePath,
+  hideCategoryDropdown
+}: {
+  categories: CategoryTree[];
+  initialCategoryId?: string;
+  initialSubCategoryId?: string;
+  initialSubSubCategoryId?: string;
+  basePath?: string;
+  hideCategoryDropdown?: boolean;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const categoryId = searchParams.get("category") ?? "";
-  const subCategoryId = searchParams.get("sub") ?? "";
-  const subSubCategoryId = searchParams.get("subsub") ?? "";
+  const categoryId = initialCategoryId || searchParams.get("category") || "";
+  const subCategoryId = initialSubCategoryId || searchParams.get("sub") || "";
+  const subSubCategoryId = initialSubSubCategoryId || searchParams.get("subsub") || "";
   const search = searchParams.get("q") ?? "";
   const minPrice = searchParams.get("min") ?? "";
   const maxPrice = searchParams.get("max") ?? "";
   const sort = searchParams.get("sort") ?? "newest";
 
+  const hasActiveFilters =
+    !!search ||
+    (!initialCategoryId && !!categoryId) ||
+    !!subCategoryId ||
+    !!subSubCategoryId ||
+    !!minPrice ||
+    !!maxPrice ||
+    sort !== "newest";
+
   function updateParams(next: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
+    
+    if (basePath) {
+       const newCat = next.category !== undefined ? next.category : categoryId;
+       const newSub = next.sub !== undefined ? next.sub : (next.category !== undefined ? null : subCategoryId);
+       const newSubSub = next.subsub !== undefined ? next.subsub : (next.sub !== undefined || next.category !== undefined ? null : subSubCategoryId);
+
+       let newPath = basePath;
+       if (newCat && !basePath.includes(newCat)) newPath += `/${newCat}`;
+       if (newCat && newSub) newPath += `/${newSub}`;
+       if (newCat && newSub && newSubSub) newPath += `/${newSubSub}`;
+
+       params.delete("page");
+       for (const [key, value] of Object.entries(next)) {
+          if (key === 'category' || key === 'sub' || key === 'subsub') continue;
+          if (value) params.set(key, value);
+          else params.delete(key);
+       }
+       router.push(`${newPath}?${params.toString()}`);
+       return;
+    }
+
     for (const [key, value] of Object.entries(next)) {
       if (value) params.set(key, value);
       else params.delete(key);
     }
-    params.delete("page"); // reset pagination on filter change
+    params.delete("page");
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  function clearAllFilters() {
+    // If basePath or current path points to the deleted root categories page, redirect safely to /shop
+    if (basePath === "/categories" || pathname === "/categories") {
+      router.push("/shop");
+      return;
+    }
+    
+    if (basePath) {
+      router.push(basePath);
+      return;
+    }
+    
+    router.push(pathname);
+  }
+
   const inputClass =
-    "w-full bg-[#F8F6F0] border border-[#1A1A1A]/10 rounded-lg px-3 py-2 text-[#1A1A1A] text-[12px] font-outfit font-light placeholder:text-[#1A1A1A]/30 focus:outline-none focus:border-[#9c7d23]/60 transition-colors";
+    "bg-transparent border border-[#1A1A1A]/15 rounded-full px-5 py-2.5 text-[#1A1A1A] text-[11px] font-outfit font-medium tracking-[0.1em] uppercase placeholder:text-[#1A1A1A]/50 focus:outline-none focus:border-[#9c7d23]/60 transition-colors cursor-pointer appearance-none";
 
   return (
-    <div className="w-full space-y-7">
-      {/* Search */}
-      <div>
-        <label className="block text-[11px] tracking-[0.2em] uppercase text-[#1A1A1A]/45 font-outfit font-light mb-2">
-          Search
-        </label>
-        <input
-          defaultValue={search}
-          onChange={(e) => updateParams({ q: e.target.value || null })}
-          placeholder="Search products…"
-          className={inputClass}
-        />
-      </div>
-
-      {/* Category tree */}
-      <div className="pt-1 border-t border-[#1A1A1A]/5">
-        <label className="block text-[11px] tracking-[0.2em] uppercase text-[#1A1A1A]/45 font-outfit font-light mb-2 mt-6">
-          Category
-        </label>
-        <div className="space-y-1">
-          <button
-            onClick={() => updateParams({ category: null, sub: null, subsub: null })}
-            className={`block w-full text-left text-[11px] tracking-[0.15em] uppercase font-outfit font-light py-1.5 transition-colors ${
-              !categoryId ? "text-[#9c7d23] font-medium" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
-            }`}
-          >
-            All
-          </button>
-          {categories.map((cat) => (
-            <div key={cat.id}>
-              <button
-                onClick={() => updateParams({ category: cat.id, sub: null, subsub: null })}
-                className={`block w-full text-left text-[11px] tracking-[0.15em] uppercase font-outfit font-light py-1.5 transition-colors ${
-                  categoryId === cat.id ? "text-[#9c7d23] font-medium" : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
-                }`}
-              >
-                {cat.name}
-              </button>
-
-              {categoryId === cat.id && cat.sub_categories.length > 0 && (
-                <div className="pl-3 space-y-1 border-l border-[#d4af37]/40 ml-1">
-                  {cat.sub_categories.map((sub) => (
-                    <div key={sub.id}>
-                      <button
-                        onClick={() => updateParams({ sub: sub.id, subsub: null })}
-                        className={`block w-full text-left text-[10.5px] tracking-[0.12em] uppercase font-outfit font-light py-1 transition-colors ${
-                          subCategoryId === sub.id ? "text-[#9c7d23] font-medium" : "text-[#1A1A1A]/50 hover:text-[#1A1A1A]/80"
-                        }`}
-                      >
-                        {sub.name}
-                      </button>
-
-                      {subCategoryId === sub.id && sub.sub_sub_categories.length > 0 && (
-                        <div className="pl-3 space-y-1 border-l border-[#d4af37]/30 ml-1">
-                          {sub.sub_sub_categories.map((subSub) => (
-                            <button
-                              key={subSub.id}
-                              onClick={() => updateParams({ subsub: subSub.id })}
-                              className={`block w-full text-left text-[10px] tracking-[0.1em] uppercase font-outfit font-light py-1 transition-colors ${
-                                subSubCategoryId === subSub.id
-                                  ? "text-[#9c7d23] font-medium"
-                                  : "text-[#1A1A1A]/40 hover:text-[#1A1A1A]/70"
-                              }`}
-                            >
-                              {subSub.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+    <div className="w-full flex flex-col items-center space-y-4">
+      <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 w-full">
+        
+        {/* Search */}
+        <div className="relative shrink-0">
+          <input
+            defaultValue={search}
+            onChange={(e) => updateParams({ q: e.target.value || null })}
+            placeholder="Search..."
+            className={`${inputClass} w-44 md:w-52 pl-11`}
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 absolute left-4.5 top-1/2 -translate-y-1/2 text-[#1A1A1A]/50 ml-1">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
         </div>
-      </div>
 
-      {/* Price range */}
-      <div className="pt-1 border-t border-[#1A1A1A]/5">
-        <label className="block text-[11px] tracking-[0.2em] uppercase text-[#1A1A1A]/45 font-outfit font-light mb-2 mt-6">
-          Price
-        </label>
-        <div className="flex items-center gap-2">
+        {/* Category */}
+        {!hideCategoryDropdown && (
+          <select
+            value={categoryId}
+            onChange={(e) => updateParams({ category: e.target.value || null, sub: null, subsub: null })}
+            className={`${inputClass} w-44 md:w-52 bg-white/50 shrink-0`}
+          >
+            <option value="">All Categories</option>
+            {categories.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        )}
+
+        {/* Sub Category */}
+        {categoryId && (
+          <select
+            value={subCategoryId}
+            onChange={(e) => updateParams({ sub: e.target.value || null, subsub: null })}
+            className={`${inputClass} w-44 md:w-52 bg-white/50 shrink-0`}
+          >
+            <option value="">All Sub-categories</option>
+            {categories.find(c => c.id === categoryId)?.sub_categories.map((sub: any) => (
+              <option key={sub.id} value={sub.id}>{sub.name}</option>
+            ))}
+          </select>
+        )}
+
+        {/* Sub-Sub Category */}
+        {categoryId && subCategoryId && (
+          <select
+            value={subSubCategoryId}
+            onChange={(e) => updateParams({ subsub: e.target.value || null })}
+            className={`${inputClass} w-44 md:w-52 bg-white/50 shrink-0`}
+          >
+            <option value="">All Deep Categories</option>
+            {categories
+              .find(c => c.id === categoryId)
+              ?.sub_categories.find((s: any) => s.id === subCategoryId)
+              ?.sub_sub_categories?.map((subSub: any) => (
+                <option key={subSub.id} value={subSub.id}>{subSub.name}</option>
+              ))}
+          </select>
+        )}
+
+        {/* Price Range */}
+        <div className="flex items-center gap-2 shrink-0">
           <input
             type="number"
             defaultValue={minPrice}
             onChange={(e) => updateParams({ min: e.target.value || null })}
-            placeholder="Min"
-            className={`w-1/2 ${inputClass}`}
+            placeholder="Min ₹"
+            className={`${inputClass} w-28 text-center px-3`}
           />
-          <span className="text-[#1A1A1A]/25 text-[11px]">–</span>
+          <span className="text-[#1A1A1A]/40">-</span>
           <input
             type="number"
             defaultValue={maxPrice}
             onChange={(e) => updateParams({ max: e.target.value || null })}
-            placeholder="Max"
-            className={`w-1/2 ${inputClass}`}
+            placeholder="Max ₹"
+            className={`${inputClass} w-28 text-center px-3`}
           />
         </div>
-      </div>
 
-      {/* Sort */}
-      <div className="pt-1 border-t border-[#1A1A1A]/5">
-        <label className="block text-[11px] tracking-[0.2em] uppercase text-[#1A1A1A]/45 font-outfit font-light mb-2 mt-6">
-          Sort by
-        </label>
+        {/* Sort */}
         <select
           value={sort}
           onChange={(e) => updateParams({ sort: e.target.value })}
-          className={inputClass}
+          className={`${inputClass} w-48 md:w-56 bg-white/50 shrink-0`}
         >
-          <option value="newest">Newest</option>
+          <option value="newest">Sort: Newest</option>
           <option value="price_asc">Price: Low to High</option>
           <option value="price_desc">Price: High to Low</option>
           <option value="name_asc">Name: A–Z</option>
         </select>
+
+        {/* Clear All */}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="shrink-0 inline-flex items-center gap-1.5 text-[#9c7d23] hover:text-[#1A1A1A] text-[11px] font-outfit font-medium tracking-[0.1em] uppercase transition-all px-3 py-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+            Clear All
+          </button>
+        )}
+
       </div>
     </div>
   );

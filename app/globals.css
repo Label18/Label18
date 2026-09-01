@@ -1,13 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
     --color-gold: #c4a174;
     --color-gold-light: #dfc08a;
     --color-gold-dark: #a88b4a;
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body: var(--font-cormorant), 'Inter', -apple-system, sans-serif;
-    --font-heading: var(--font-cinzel), 'Outfit', 'Inter', sans-serif;
-    --font-serif: 'Playfair Display', 'Georgia', serif;
+    --font-outfit: 'Outfit', sans-serif;
+    --font-display: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+    --font-serif: 'Outfit', sans-serif;
 }
 
 /* ============================================
@@ -37,10 +39,11 @@
     --color-border: rgba(196, 161, 116, 0.12);
     --color-border-light: rgba(196, 161, 116, 0.06);
 
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body: var(--font-cormorant), 'Inter', -apple-system, sans-serif;
-    --font-heading: var(--font-cinzel), 'Outfit', 'Inter', sans-serif;
-    --font-serif: 'Playfair Display', 'Georgia', serif;
+    --font-outfit: 'Outfit', sans-serif;
+    --font-display: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-heading: 'Outfit', sans-serif;
+    --font-serif: 'Outfit', sans-serif;
 
     --container-max: 1400px;
     --container-padding: 3rem;
@@ -51,6 +54,10 @@
     --transition-fast: 0.3s var(--ease-smooth);
     --transition-medium: 0.6s var(--ease-out-expo);
     --transition-slow: 1s var(--ease-out-expo);
+}
+
+* {
+    font-family: 'Outfit', sans-serif !important;
 }
 
 /* === RESET ===
@@ -65,6 +72,7 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: 'Outfit', sans-serif !important;
     }
 
     html {
@@ -72,10 +80,11 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color-scheme: light;
+        font-family: 'Outfit', sans-serif !important;
     }
 
     body {
-        font-family: var(--font-body);
+        font-family: 'Outfit', sans-serif !important;
         background: var(--color-bg);
         color: var(--color-text);
         line-height: 1.6;
@@ -390,14 +399,14 @@
 
 /* Position helper classes for dynamic overlay placement */
 .pos-top-right {
-    top: 5% !important;
+    top: 20% !important;
     right: 5% !important;
     left: auto !important;
     bottom: auto !important;
 }
 
 .pos-top-left {
-    top: 5% !important;
+    top: 20% !important;
     left: 5% !important;
     right: auto !important;
     bottom: auto !important;

@@ -335,7 +335,7 @@ function ViewCouponModal({ coupon, onClose }: { coupon: Coupon; onClose: () => v
                 <div className="mb-5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Tag size={18} className="text-stone-400" />
-                        <h2 className="text-lg font-bold font-mono text-[#141414]">{coupon.code}</h2>
+                        <h2 className="text-lg font-bold font-outfit text-[#141414]">{coupon.code}</h2>
                     </div>
                     <button onClick={onClose} className="text-[#8b8478] hover:text-[#141414]">
                         <X size={18} />
@@ -607,7 +607,7 @@ export default function CouponsClient({ coupons }: { coupons: Coupon[] }) {
                                     <td className="px-6 py-3.5">
                                         <div className="flex items-center gap-2">
                                             <Tag size={14} className="text-stone-400" />
-                                            <span className="font-mono font-semibold text-black">{c.code}</span>
+                                            <span className="font-outfit font-semibold text-black">{c.code}</span>
                                             <button
                                                 onClick={() => handleCopy(c.code, c.id)}
                                                 className="text-stone-400 hover:text-stone-700 transition-colors"

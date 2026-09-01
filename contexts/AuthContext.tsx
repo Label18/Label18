@@ -10,6 +10,7 @@ import {
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "react-hot-toast";
 
 export interface Profile {
   id: string;
@@ -48,7 +49,8 @@ interface AuthContextType {
   toggleWishlist: (productId: string, variationId: string | null) => Promise<boolean>;
 
   isLoginOpen: boolean;
-  openLoginModal: () => void;
+  loginPrompt: string | null;
+  openLoginModal: (reason?: string | unknown) => void;
   closeLoginModal: () => void;
 }
 
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loginPrompt, setLoginPrompt] = useState<string | null>(null);
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -198,6 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     await refreshCart();
+    toast.success("Added to your shopping bag");
   };
 
   const updateCartQuantity = async (cartItemId: string, quantity: number) => {
@@ -265,13 +269,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     await refreshWishlist();
+    if (nowActive) {
+      toast.success("Added to your wishlist", { icon: "🤍" });
+    } else {
+      toast("Removed from your wishlist", { icon: "💔" });
+    }
     return nowActive;
   };
 
   // ---------- Shared login modal ----------
 
-  const openLoginModal = () => setIsLoginOpen(true);
-  const closeLoginModal = () => setIsLoginOpen(false);
+  const openLoginModal = (reason?: string | unknown) => {
+    setLoginPrompt(typeof reason === "string" ? reason : null);
+    setIsLoginOpen(true);
+  };
+  const closeLoginModal = () => {
+    setIsLoginOpen(false);
+    setLoginPrompt(null);
+  };
 
   return (
     <AuthContext.Provider
@@ -293,6 +308,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInWishlist,
         toggleWishlist,
         isLoginOpen,
+        loginPrompt,
         openLoginModal,
         closeLoginModal,
       }}

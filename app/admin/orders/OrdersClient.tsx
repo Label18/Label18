@@ -263,7 +263,7 @@ export default function OrdersClient({ orders: initialOrders }: { orders: StoreO
                                                 />
                                             </button>
                                         </td>
-                                        <td className="px-6 py-3.5 font-mono text-xs text-stone-600">
+                                        <td className="px-6 py-3.5 font-outfit text-xs text-stone-600">
                                             #{o.id.slice(0, 8).toUpperCase()}
                                         </td>
                                         <td className="px-6 py-3.5">

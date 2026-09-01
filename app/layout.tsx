@@ -14,9 +14,11 @@ const bebas = Bebas_Neue({ subsets: ["latin"], weight: "400", variable: "--font-
 const syncopate = Syncopate({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-syncopate" });
 
 export const metadata: Metadata = {
-  title: "The 18 Label",
+  title: "The Label 18",
   description: "Wear your energy. Express your essence.",
 };
+
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children,
@@ -24,12 +26,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+      </head>
       <body
-        className={`${inter.variable} ${outfit.variable} ${cormorant.variable} ${playfair.variable} ${cinzel.variable} ${montserrat.variable} ${bebas.variable} ${syncopate.variable} antialiased overflow-x-hidden`}
+        className={`${outfit.variable} antialiased overflow-x-hidden`}
+        suppressHydrationWarning
       >
         <AuthProvider>
-        {children}
+          {children}
+          <Toaster 
+            position="bottom-center"
+            toastOptions={{
+              style: {
+                background: '#141414',
+                color: '#fff',
+                fontFamily: 'Outfit, sans-serif',
+                border: '1px solid #333',
+                fontSize: '14px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#d4af37',
+                  secondary: '#141414',
+                },
+              },
+            }}
+          />
         </AuthProvider>
       </body>
     </html>

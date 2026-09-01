@@ -10,7 +10,7 @@ export default async function LoginPage({
     const errorMessage = params?.error
 
     return (
-        <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#030303] px-4 font-sans text-[#F5F2EB]">
+        <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#030303] px-4 font-outfit text-[#F5F2EB]">
             {/* Luxury Ambient Glows */}
             <div className="absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-[#D4AF37]/10 blur-[180px] pointer-events-none" />
             <div className="absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-[#C5A059]/5 blur-[180px] pointer-events-none" />
@@ -44,7 +44,7 @@ export default async function LoginPage({
                         </p>
                     </div>
 
-                    <div className="text-xs text-white/30 tracking-widest font-mono">
+                    <div className="text-xs text-white/30 tracking-widest font-outfit">
                         SECURE PORTAL v2.6
                     </div>
                 </div>

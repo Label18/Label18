@@ -80,7 +80,6 @@ export default function AddressForm({
 
         <h2
           className="text-xl uppercase tracking-[0.15em] mb-6"
-          style={{ fontFamily: '"Times New Roman", Times, serif' }}
         >
           Add Address
         </h2>

@@ -80,7 +80,7 @@ export default function Sidebar() {
     href === '/admin' ? pathname === href : pathname?.startsWith(href)
 
   return (
-    <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r border-[#D4AF37]/10 bg-[#0a0a0a] font-sans text-[#F5F2EB]">
+    <aside className="fixed left-0 top-0 flex h-screen w-72 flex-col border-r border-[#D4AF37]/10 bg-[#0a0a0a] font-outfit text-[#F5F2EB]">
       {/* Brand header — sticky, stays put while the nav list below scrolls */}
       <div className="sticky top-0 z-10 shrink-0 bg-[#0a0a0a]">
         <div className="flex items-center gap-3.5 px-6 py-6">

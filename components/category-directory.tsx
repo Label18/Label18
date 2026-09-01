@@ -61,7 +61,7 @@ function PhotoBlock({
           style={{ background: `${accent}14` }}
         >
           <span
-            style={{ fontFamily: '"Times New Roman", Times, serif', color: accent }}
+            style={{ color: accent }}
             className="text-3xl italic"
           >
             {initials(name)}
@@ -169,18 +169,15 @@ export function CategoryDirectory({ categories }: { categories: CategoryTree[] }
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent to-[#9c7d23]/50 mx-auto mb-6" />
           <span className="font-outfit font-light text-[10px] tracking-[0.5em] uppercase text-[#9c7d23] mb-4 block">
             Directory &amp; Index
           </span>
           <h1
             className="font-normal text-4xl md:text-6xl text-[#1A1A1A] tracking-widest uppercase"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
           >
             All{" "}
             <span
-              className="text-[#9c7d23] italic font-normal tracking-normal lowercase"
-              style={{ fontFamily: '"Times New Roman", Times, serif' }}
+              className="text-[#9c7d23] font-normal tracking-normal uppercase"
             >
               Categories
             </span>
@@ -271,7 +268,6 @@ export function CategoryDirectory({ categories }: { categories: CategoryTree[] }
                 />
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[#1A1A1A]/5">
                   <span
-                    style={{ fontFamily: '"Times New Roman", Times, serif' }}
                     className="text-xl italic text-[#1A1A1A]"
                   >
                     {active.name}

@@ -206,7 +206,7 @@ export default function RegisterClient({ initialProducts }: { initialProducts: S
               onChange={(e) => setScanValue(e.target.value)}
               placeholder="Scan barcode here…"
               autoFocus
-              className="flex-1 border-none bg-transparent text-lg font-mono text-black outline-none placeholder:text-stone-400"
+              className="flex-1 border-none bg-transparent text-lg font-outfit text-black outline-none placeholder:text-stone-400"
             />
             <button
               type="submit"

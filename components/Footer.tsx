@@ -7,11 +7,18 @@ const contactItems = [
   { label: "Inquiries", value: "contact@thelabel18.com", href: "mailto:contact@thelabel18.com" },
 ];
 
+const instagramPath = "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z";
+
 const socialLinks = [
   {
-    label: "Instagram",
-    href: "#",
-    path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z",
+    label: "Jewellery",
+    href: "https://www.instagram.com/thelabel18_accessories?igsi=MW8yOGFlYzdwd2ZoOQ%3D%3D&utm_source=qr",
+    path: instagramPath,
+  },
+  {
+    label: "Clothing",
+    href: "https://www.instagram.com/thelabel_18?igsi=c3E5YW8weXNrajJo&utm_source=qr",
+    path: instagramPath,
   },
   {
     label: "Facebook",
@@ -53,25 +60,32 @@ export default async function Footer() {
                 className="w-12 h-12 object-contain rounded-sm border border-[#d4af37]/40 shadow-sm"
               />
             </Link>
-            <h2 className="text-xl text-[#1A1A1A] tracking-widest uppercase mb-3" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <h2 className="text-xl text-[#1A1A1A] tracking-widest uppercase mb-3">
               THE LABEL{" "}
-              <span className="text-[#9c7d23] italic font-normal lowercase" style={{ fontFamily: '"Times New Roman", Times, serif' }}>18</span>
+              <span className="text-[#9c7d23] italic font-normal lowercase">18</span>
             </h2>
             <p className="font-outfit font-light text-[#1A1A1A]/70 text-[13px] leading-[1.8] tracking-wide mb-6 max-w-[260px]">
               Growth, positivity, abundance, confidence, and new beginnings.
               Wear your energy. Express your essence.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-9 h-9 shrink-0 rounded-full border border-[#1A1A1A]/20 bg-white flex items-center justify-center text-[#1A1A1A]/80 hover:bg-[#1A1A1A] hover:text-[#F8F6F0] hover:border-[#1A1A1A] transition-all duration-300 shadow-sm"
+                  className="flex flex-col items-center gap-1.5 group"
                 >
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d={social.path} />
-                  </svg>
+                  <span className="w-9 h-9 shrink-0 rounded-full border border-[#1A1A1A]/20 bg-white flex items-center justify-center text-[#1A1A1A]/80 group-hover:bg-[#1A1A1A] group-hover:text-[#F8F6F0] group-hover:border-[#1A1A1A] transition-all duration-300 shadow-sm">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d={social.path} />
+                    </svg>
+                  </span>
+                  <span className="font-outfit font-light text-[9px] tracking-[0.15em] uppercase text-[#1A1A1A]/60 group-hover:text-[#9c7d23] transition-colors duration-300">
+                    {social.label}
+                  </span>
                 </a>
               ))}
             </div>
@@ -79,7 +93,7 @@ export default async function Footer() {
 
           {/* Column 2 — Menu */}
           <div className="lg:px-10 lg:border-r lg:border-[#1A1A1A]/10">
-            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6">
               Menu
             </h3>
             <ul className="space-y-3">
@@ -99,7 +113,7 @@ export default async function Footer() {
 
           {/* Column 3 — Curations / Categories */}
           <div className="lg:px-10 lg:border-r lg:border-[#1A1A1A]/10">
-            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6">
               Curations
             </h3>
             {featuredCategories.length === 0 ? (
@@ -142,7 +156,7 @@ export default async function Footer() {
 
           {/* Column 4 — Boutique / Contact */}
           <div className="lg:pl-10">
-            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+            <h3 className="font-outfit font-medium text-[11px] text-[#9c7d23] tracking-[0.35em] uppercase mb-6">
               Boutique
             </h3>
             <div className="space-y-6">

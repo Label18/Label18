@@ -126,7 +126,7 @@ export default function CartPage() {
         <div className="text-center max-w-sm">
           <h1
             className="text-2xl uppercase tracking-[0.15em] mb-4"
-            style={{ fontFamily: '"Times New Roman", Times, serif' }}
+           
           >
             Your Cart
           </h1>
@@ -149,7 +149,7 @@ export default function CartPage() {
       <div className="max-w-[1000px] mx-auto">
         <h1
           className="text-2xl md:text-3xl uppercase tracking-[0.15em] mb-10"
-          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+         
         >
           Your Cart
         </h1>
@@ -238,7 +238,7 @@ export default function CartPage() {
 
                         <p
                           className="text-base font-outfit font-medium text-[#9c7d23]"
-                          style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                         
                         >
                           ₹{(price * item.quantity).toLocaleString()}
                         </p>
@@ -262,13 +262,13 @@ export default function CartPage() {
               <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg p-6 sticky top-28">
                 <h2
                   className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-5"
-                  style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                 
                 >
                   Order Summary
                 </h2>
                 <div className="flex justify-between text-sm font-outfit font-light mb-2">
                   <span className="text-[#1A1A1A]/60">Subtotal</span>
-                  <span>₹{subtotal.toLocaleString()}</span>
+                  <span className="font-bold text-red-600">₹{subtotal.toLocaleString()}</span>
                 </div>
                 <p className="text-[10px] text-[#1A1A1A]/40 font-outfit font-light mb-5">
                   Shipping and taxes calculated at checkout.
@@ -284,7 +284,7 @@ export default function CartPage() {
                   onClick={handleCheckout}
                   disabled={hasOutOfStockItem}
                   className="w-full py-4 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ fontFamily: '"Times New Roman", Times, serif' }}
+                 
                 >
                   Checkout
                 </button>

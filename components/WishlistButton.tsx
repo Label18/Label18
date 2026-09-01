@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "react-hot-toast";
 
 export default function WishlistButton({
   productId,
@@ -10,9 +11,9 @@ export default function WishlistButton({
 }: {
   productId: string;
   variationId: string | null;
-  onRequireLogin?: () => void;
+  onRequireLogin?: (reason?: string) => void;
 }) {
-  const { user, toggleWishlist, isInWishlist, refreshWishlist } = useAuth();
+  const { user, toggleWishlist, isInWishlist, refreshWishlist, openLoginModal } = useAuth();
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,12 @@ export default function WishlistButton({
 
   async function handleClick() {
     if (!user) {
-      onRequireLogin?.();
+      toast("Please login first to save to wishlist", { icon: "⚠️" });
+      if (onRequireLogin) {
+        onRequireLogin("Please sign in to save items to your wishlist.");
+      } else {
+        openLoginModal("Please sign in to save items to your wishlist.");
+      }
       return;
     }
     setLoading(true);
