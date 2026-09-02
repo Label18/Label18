@@ -211,7 +211,7 @@ export default function CartPage() {
         await loadCart();
         await refreshCart();
       } else {
-        guest.updateCartQuantity(item.productId, item.variationId, next);
+        guest.updateQuantity(item.productId, item.variationId, next); // ← was guest.updateCartQuantity
         await loadGuestCart();
       }
     } catch (err: any) {
@@ -256,7 +256,7 @@ export default function CartPage() {
       <div className="max-w-[1000px] mx-auto">
         <h1
           className="text-2xl md:text-3xl uppercase tracking-[0.15em] mb-10"
-         
+
         >
           Your Cart
         </h1>
@@ -341,7 +341,7 @@ export default function CartPage() {
 
                         <p
                           className="text-base font-outfit font-medium text-[#9c7d23]"
-                         
+
                         >
                           ₹{(item.price * item.quantity).toLocaleString()}
                         </p>
@@ -365,7 +365,7 @@ export default function CartPage() {
               <div className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg p-6 sticky top-28">
                 <h2
                   className="text-[11px] tracking-[0.3em] uppercase font-outfit font-medium text-[#9c7d23] mb-5"
-                 
+
                 >
                   Order Summary
                 </h2>
@@ -393,7 +393,7 @@ export default function CartPage() {
                   onClick={handleCheckout}
                   disabled={hasOutOfStockItem}
                   className="w-full py-4 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                 
+
                 >
                   {user ? "Checkout" : "Login to Checkout"}
                 </button>
