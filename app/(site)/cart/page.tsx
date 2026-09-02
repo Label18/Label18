@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import { createClient } from "@/lib/supabase/client";
+import LoginModal from "@/components/LoginModal";
 
 type CartRow = {
   id: string;
@@ -31,19 +33,49 @@ type CartRow = {
   } | null;
 };
 
+// Both logged-in (Supabase) and guest (localStorage) rows get normalized
+// into this shape so the render logic below doesn't need to branch.
+type DisplayCartItem = {
+  key: string; // cart_items.id for users, `${productId}-${variationId}` for guests
+  productId: string;
+  variationId: string | null;
+  quantity: number;
+  name: string;
+  image: string | null;
+  color: string | null;
+  size: string | null;
+  sku: string | null;
+  price: number;
+  stockQuantity: number | null; // null = unknown
+};
+
 export default function CartPage() {
-  const { user, loading: authLoading, openLoginModal, updateCartQuantity, removeFromCart, refreshCart } = useAuth();
+  const {
+    user,
+    loading: authLoading,
+    updateCartQuantity,
+    removeFromCart,
+    refreshCart,
+  } = useAuth();
+  const guest = useGuestCartWishlist();
   const supabase = createClient();
   const router = useRouter();
 
-  const [items, setItems] = useState<CartRow[]>([]);
+  const [rows, setRows] = useState<CartRow[]>([]);
+  const [guestDisplayItems, setGuestDisplayItems] = useState<DisplayCartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
+  // Login modal for checkout — opened locally on this page instead of
+  // relying on a global openLoginModal, so we can redirect to /checkout
+  // as soon as login succeeds.
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const redirectToCheckoutRef = useRef(false);
+
   const loadCart = useCallback(async () => {
     if (!user) {
-      setItems([]);
+      setRows([]);
       setLoading(false);
       return;
     }
@@ -59,90 +91,165 @@ export default function CartPage() {
 
     if (error) {
       setError(error.message);
-      setItems([]);
+      setRows([]);
     } else {
-      setItems((data ?? []) as unknown as CartRow[]);
+      setRows((data ?? []) as unknown as CartRow[]);
     }
     setLoading(false);
   }, [user, supabase]);
 
-  useEffect(() => {
-    if (!authLoading) loadCart();
-  }, [authLoading, loadCart]);
+  // Guests: merge the cached localStorage entries with fresh price/stock
+  // from Supabase so displayed prices and stock are never stale.
+  const loadGuestCart = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-  function setPending(id: string, on: boolean) {
+    const localItems = guest.cart ?? [];
+    if (localItems.length === 0) {
+      setGuestDisplayItems([]);
+      setLoading(false);
+      return;
+    }
+
+    const variationIds = [
+      ...new Set(localItems.map((i) => i.variationId).filter(Boolean)),
+    ] as string[];
+
+    let freshById = new Map<string, any>();
+    if (variationIds.length > 0) {
+      const { data, error } = await supabase
+        .from("product_variations")
+        .select("id, size, color, color_hex, price, compare_at_price, stock_quantity, sku, image_url")
+        .in("id", variationIds);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        freshById = new Map((data ?? []).map((v: any) => [v.id, v]));
+      }
+    }
+
+    const display: DisplayCartItem[] = localItems.map((item) => {
+      const fresh = item.variationId ? freshById.get(item.variationId) : null;
+      return {
+        key: `${item.productId}-${item.variationId ?? "default"}`,
+        productId: item.productId,
+        variationId: item.variationId ?? null,
+        quantity: item.quantity,
+        name: item.name,
+        image: fresh?.image_url ?? item.image ?? null,
+        color: fresh?.color ?? item.color ?? null,
+        size: fresh?.size ?? item.size ?? null,
+        sku: fresh?.sku ?? null,
+        price: fresh?.price != null ? Number(fresh.price) : item.price,
+        stockQuantity: fresh?.stock_quantity ?? null,
+      };
+    });
+
+    setGuestDisplayItems(display);
+    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guest.cart, supabase]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (user) {
+      loadCart();
+    } else {
+      loadGuestCart();
+    }
+  }, [authLoading, user, loadCart, loadGuestCart]);
+
+  // Once login succeeds while the modal was opened for checkout, close it
+  // and go straight to /checkout instead of leaving the user on /cart.
+  useEffect(() => {
+    if (user && redirectToCheckoutRef.current) {
+      redirectToCheckoutRef.current = false;
+      setIsLoginOpen(false);
+      router.push("/checkout");
+    }
+  }, [user, router]);
+
+  function setPending(key: string, on: boolean) {
     setPendingIds((prev) => {
       const next = new Set(prev);
-      if (on) next.add(id);
-      else next.delete(id);
+      if (on) next.add(key);
+      else next.delete(key);
       return next;
     });
   }
 
-  async function handleQuantityChange(cartItemId: string, next: number) {
-    setPending(cartItemId, true);
+  const displayItems: DisplayCartItem[] = useMemo(() => {
+    if (user) {
+      return rows.map((item) => {
+        const variation = item.product_variations;
+        const product = item.products;
+        return {
+          key: item.id,
+          productId: item.product_id,
+          variationId: item.variation_id,
+          quantity: item.quantity,
+          name: product?.name ?? "Product",
+          image: variation?.image_url || product?.image_url || null,
+          color: variation?.color ?? null,
+          size: variation?.size ?? null,
+          sku: variation?.sku ?? null,
+          price: Number(variation?.price ?? 0),
+          stockQuantity: variation?.stock_quantity ?? null,
+        };
+      });
+    }
+    return guestDisplayItems;
+  }, [user, rows, guestDisplayItems]);
+
+  async function handleQuantityChange(item: DisplayCartItem, next: number) {
+    if (next < 1) return;
+    setPending(item.key, true);
     try {
-      await updateCartQuantity(cartItemId, next);
-      await loadCart();
-      await refreshCart();
+      if (user) {
+        await updateCartQuantity(item.key, next);
+        await loadCart();
+        await refreshCart();
+      } else {
+        guest.updateCartQuantity(item.productId, item.variationId, next);
+        await loadGuestCart();
+      }
     } catch (err: any) {
       setError(err?.message ?? "Couldn't update quantity.");
     } finally {
-      setPending(cartItemId, false);
+      setPending(item.key, false);
     }
   }
 
-  async function handleRemove(cartItemId: string) {
-    setPending(cartItemId, true);
+  async function handleRemove(item: DisplayCartItem) {
+    setPending(item.key, true);
     try {
-      await removeFromCart(cartItemId);
-      await loadCart();
-      await refreshCart();
+      if (user) {
+        await removeFromCart(item.key);
+        await loadCart();
+        await refreshCart();
+      } else {
+        guest.removeFromCart(item.productId, item.variationId);
+        await loadGuestCart();
+      }
     } catch (err: any) {
       setError(err?.message ?? "Couldn't remove item.");
     } finally {
-      setPending(cartItemId, false);
+      setPending(item.key, false);
     }
   }
 
   function handleCheckout() {
     if (!user) {
-      openLoginModal();
+      redirectToCheckoutRef.current = true;
+      setIsLoginOpen(true);
       return;
     }
     router.push("/checkout");
   }
 
-  const subtotal = items.reduce((sum, item) => {
-    const price = Number(item.product_variations?.price ?? 0);
-    return sum + price * item.quantity;
-  }, 0);
-
-  const hasOutOfStockItem = items.some((item) => (item.product_variations?.stock_quantity ?? 0) <= 0);
-
-  if (!authLoading && !user) {
-    return (
-      <main className="w-full min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pt-32 pb-16 px-6 lg:px-16 flex items-center justify-center">
-        <div className="text-center max-w-sm">
-          <h1
-            className="text-2xl uppercase tracking-[0.15em] mb-4"
-           
-          >
-            Your Cart
-          </h1>
-          <p className="text-sm text-[#1A1A1A]/60 font-outfit font-light mb-6">
-            Sign in to view items you&apos;ve added to your cart.
-          </p>
-          <button
-            onClick={openLoginModal}
-            className="px-8 py-3 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all"
-          >
-            Login
-          </button>
-        </div>
-      </main>
-    );
-  }
+  const subtotal = displayItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const hasOutOfStockItem = displayItems.some((item) => (item.stockQuantity ?? 1) <= 0);
 
   return (
     <main className="w-full min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pt-24 md:pt-32 pb-16 px-6 lg:px-16">
@@ -158,9 +265,9 @@ export default function CartPage() {
           <p className="text-[12px] font-outfit text-red-600/90 mb-6">{error}</p>
         )}
 
-        {loading ? (
+        {authLoading || loading ? (
           <p className="text-sm text-[#1A1A1A]/50 font-outfit font-light">Loading cart...</p>
-        ) : items.length === 0 ? (
+        ) : displayItems.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-sm text-[#1A1A1A]/60 font-outfit font-light mb-6">
               Your cart is empty.
@@ -176,22 +283,18 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
             {/* Items */}
             <div className="lg:col-span-8 space-y-4">
-              {items.map((item) => {
-                const variation = item.product_variations;
-                const product = item.products;
-                const image = variation?.image_url || product?.image_url;
-                const price = Number(variation?.price ?? 0);
-                const isPending = pendingIds.has(item.id);
-                const outOfStock = (variation?.stock_quantity ?? 0) <= 0;
+              {displayItems.map((item) => {
+                const isPending = pendingIds.has(item.key);
+                const outOfStock = (item.stockQuantity ?? 1) <= 0;
 
                 return (
                   <div
-                    key={item.id}
+                    key={item.key}
                     className="flex gap-4 bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg p-4 md:p-5"
                   >
                     <div className="relative w-20 h-24 md:w-24 md:h-28 flex-shrink-0 rounded overflow-hidden bg-white border border-[#1A1A1A]/10">
-                      {image ? (
-                        <Image src={image} alt={product?.name ?? "Product"} fill className="object-cover" />
+                      {item.image ? (
+                        <Image src={item.image} alt={item.name} fill className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[9px] uppercase tracking-widest text-[#1A1A1A]/30">
                           No Image
@@ -202,13 +305,13 @@ export default function CartPage() {
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
                         <Link
-                          href={`/product/${item.product_id}`}
+                          href={`/product/${item.productId}`}
                           className="text-sm md:text-base font-outfit font-medium uppercase tracking-wide hover:text-[#9c7d23] transition-colors line-clamp-2"
                         >
-                          {product?.name ?? "Product"}
+                          {item.name}
                         </Link>
                         <p className="text-[11px] text-[#1A1A1A]/50 font-outfit font-light mt-1">
-                          {[variation?.color, variation?.size].filter(Boolean).join(" / ") || variation?.sku}
+                          {[item.color, item.size].filter(Boolean).join(" / ") || item.sku}
                         </p>
                         {outOfStock && (
                           <p className="text-[10px] uppercase tracking-widest text-red-600/80 font-outfit font-medium mt-1">
@@ -220,15 +323,15 @@ export default function CartPage() {
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center border border-[#1A1A1A]/20 rounded">
                           <button
-                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                            disabled={isPending}
+                            onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                            disabled={isPending || item.quantity <= 1}
                             className="w-8 h-8 flex items-center justify-center text-[#1A1A1A]/70 hover:text-[#9c7d23] disabled:opacity-40"
                           >
                             −
                           </button>
                           <span className="w-8 text-center text-sm font-outfit">{item.quantity}</span>
                           <button
-                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                            onClick={() => handleQuantityChange(item, item.quantity + 1)}
                             disabled={isPending}
                             className="w-8 h-8 flex items-center justify-center text-[#1A1A1A]/70 hover:text-[#9c7d23] disabled:opacity-40"
                           >
@@ -240,12 +343,12 @@ export default function CartPage() {
                           className="text-base font-outfit font-medium text-[#9c7d23]"
                          
                         >
-                          ₹{(price * item.quantity).toLocaleString()}
+                          ₹{(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
 
                       <button
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item)}
                         disabled={isPending}
                         className="self-start mt-2 text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40 hover:text-red-600/80 font-outfit transition-colors disabled:opacity-40"
                       >
@@ -280,19 +383,33 @@ export default function CartPage() {
                   </p>
                 )}
 
+                {!user && (
+                  <p className="text-[11px] text-[#1A1A1A]/50 font-outfit mb-3">
+                    You&apos;ll need to sign in to check out.
+                  </p>
+                )}
+
                 <button
                   onClick={handleCheckout}
                   disabled={hasOutOfStockItem}
                   className="w-full py-4 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                  
                 >
-                  Checkout
+                  {user ? "Checkout" : "Login to Checkout"}
                 </button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => {
+          setIsLoginOpen(false);
+          redirectToCheckoutRef.current = false;
+        }}
+      />
     </main>
   );
 }

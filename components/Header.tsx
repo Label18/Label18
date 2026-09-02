@@ -8,6 +8,7 @@ import CategoryNavItem from "@/components/CategoryNavItem";
 import CategoryAccordionMobile from "@/components/CategoryAccordionMobile";
 import { getCategoriesTree, CategoryTree } from "@/lib/categories";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import LoginModal from "@/components/LoginModal";
 import SearchModal from "@/components/SearchModal";
 
@@ -21,7 +22,19 @@ export default function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const { user, profile, signOut, cartCount, wishlistCount } = useAuth();
+  const {
+    user,
+    profile,
+    signOut,
+    cartCount: authCartCount,
+    wishlistCount: authWishlistCount,
+  } = useAuth();
+
+  // Guests get their own localStorage-backed counts; logged-in users
+  // keep using the real Supabase-backed counts from AuthContext.
+  const guest = useGuestCartWishlist();
+  const cartCount = user ? authCartCount : guest.cartCount;
+  const wishlistCount = user ? authWishlistCount : guest.wishlistCount;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,7 +123,13 @@ export default function Header() {
               Shop
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-[#d4af37] transition-all duration-500 ease-out group-hover:w-full opacity-80"></span>
             </Link>
-
+            <Link
+              href="/video"
+              className="group relative text-white hover:text-[#d4af37] transition-colors duration-300 font-outfit font-medium text-[11px] tracking-[0.25em] uppercase py-2 whitespace-nowrap"
+            >
+              Video
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-[#d4af37] transition-all duration-500 ease-out group-hover:w-full opacity-80"></span>
+            </Link>
             <Link
               href="/about"
               className="group relative text-white hover:text-[#d4af37] transition-colors duration-300 font-outfit font-medium text-[11px] tracking-[0.25em] uppercase py-2 whitespace-nowrap"
@@ -124,7 +143,7 @@ export default function Header() {
           <div className="flex-1 flex items-center justify-end gap-5 md:gap-6">
             {/* Search Button */}
             <div className="hidden md:flex items-center">
-              <button 
+              <button
                 onClick={() => setIsSearchOpen(true)}
                 className="text-white hover:text-[#d4af37] transition-all duration-300 group"
               >
@@ -134,39 +153,35 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Wishlist */}
-            {user && (
-              <Link
-                href="/wishlist"
-                className="relative text-white hover:text-[#d4af37] transition-all duration-300 group hidden md:block"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 transition-transform duration-300 group-hover:scale-110">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                </svg>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex items-center justify-center w-4 h-4 rounded-full bg-[#d4af37] text-black text-[9px] font-outfit font-bold">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
-            )}
+            {/* Wishlist - works for guests (localStorage) and logged-in users alike */}
+            <Link
+              href="/wishlist"
+              className="relative text-white hover:text-[#d4af37] transition-all duration-300 group hidden md:block"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 transition-transform duration-300 group-hover:scale-110">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex items-center justify-center w-4 h-4 rounded-full bg-[#d4af37] text-black text-[9px] font-outfit font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
 
-            {/* Cart */}
-            {user && (
-              <Link
-                href="/cart"
-                className="relative text-white hover:text-[#d4af37] transition-all duration-300 group hidden md:block"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 transition-transform duration-300 group-hover:scale-110">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.876-4.145 2.147-4.72.174-.373-.041-.813-.417-.813H5.106M7.5 14.25 5.106 5.272M6 21a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                </svg>
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 flex items-center justify-center w-4 h-4 rounded-full bg-[#d4af37] text-black text-[9px] font-outfit font-bold">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            )}
+            {/* Cart - works for guests (localStorage) and logged-in users alike */}
+            <Link
+              href="/cart"
+              className="relative text-white hover:text-[#d4af37] transition-all duration-300 group hidden md:block"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 transition-transform duration-300 group-hover:scale-110">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.876-4.145 2.147-4.72.174-.373-.041-.813-.417-.813H5.106M7.5 14.25 5.106 5.272M6 21a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex items-center justify-center w-4 h-4 rounded-full bg-[#d4af37] text-black text-[9px] font-outfit font-bold">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
 
             {/* Login / Account */}
             {user ? (
@@ -304,7 +319,13 @@ export default function Header() {
             >
               Shop
             </Link>
-
+            <Link
+              href="/video"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-white/80 hover:text-[#d4af37] transition-colors font-outfit font-light text-[13px] tracking-[0.2em] uppercase py-3.5 border-b border-white/5"
+            >
+             Video
+            </Link>
             {/* Categories accordion (mobile) */}
             <div className="border-b border-white/5">
               <CategoryAccordionMobile
@@ -321,25 +342,22 @@ export default function Header() {
               About Us
             </Link>
 
-            {user && (
-              <>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-white/80 hover:text-[#d4af37] transition-colors font-outfit font-light text-[13px] tracking-[0.2em] uppercase py-3.5 border-b border-white/5"
-                >
-                  Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ""}
-                </Link>
+            {/* Wishlist & Cart - work for guests (localStorage) and logged-in users alike */}
+            <Link
+              href="/wishlist"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-white/80 hover:text-[#d4af37] transition-colors font-outfit font-light text-[13px] tracking-[0.2em] uppercase py-3.5 border-b border-white/5"
+            >
+              Wishlist{wishlistCount > 0 ? ` (${wishlistCount})` : ""}
+            </Link>
 
-                <Link
-                  href="/cart"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-white/80 hover:text-[#d4af37] transition-colors font-outfit font-light text-[13px] tracking-[0.2em] uppercase py-3.5 border-b border-white/5"
-                >
-                  Cart{cartCount > 0 ? ` (${cartCount})` : ""}
-                </Link>
-              </>
-            )}
+            <Link
+              href="/cart"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-white/80 hover:text-[#d4af37] transition-colors font-outfit font-light text-[13px] tracking-[0.2em] uppercase py-3.5 border-b border-white/5"
+            >
+              Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+            </Link>
           </nav>
 
           {/* Spacer pushes account section to the bottom */}

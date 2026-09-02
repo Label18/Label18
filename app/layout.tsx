@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter, Outfit, Cormorant_Garamond, Playfair_Display, Cinzel, Montserrat, Bebas_Neue, Syncopate } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { GuestCartWishlistProvider } from "@/contexts/GuestCartWishlistContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -36,7 +37,7 @@ export default function RootLayout({
         className={`${outfit.variable} antialiased overflow-x-hidden`}
         suppressHydrationWarning
       >
-        <AuthProvider>
+        <AuthProvider>  <GuestCartWishlistProvider>
           {children}
           <Toaster 
             position="bottom-center"
@@ -55,8 +56,9 @@ export default function RootLayout({
                 },
               },
             }}
-          />
+          />    </GuestCartWishlistProvider>
         </AuthProvider>
+    
       </body>
     </html>
   );

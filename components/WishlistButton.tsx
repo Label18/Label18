@@ -1,61 +1,84 @@
 "use client";
 
+/**
+ * components/WishlistButton.tsx
+ *
+ * INFERRED from how ProductVariantSelector calls this component — you
+ * didn't paste the real file, so please compare this against yours and
+ * let me know if the props/markup differ. The guest-fallback pattern
+ * below (branch on `user`, use GuestCartWishlistContext when signed out)
+ * is what matters; swap it into your real file if the styling differs.
+ */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import { toast } from "react-hot-toast";
 
 export default function WishlistButton({
   productId,
   variationId,
+  productName,
+  productPrice,
+  productImage,
   onRequireLogin,
 }: {
   productId: string;
-  variationId: string | null;
+  variationId?: string | null;
+  productName?: string;
+  productPrice?: number | null;
+  productImage?: string | null;
   onRequireLogin?: (reason?: string) => void;
 }) {
-  const { user, toggleWishlist, isInWishlist, refreshWishlist, openLoginModal } = useAuth();
+  const { user, toggleWishlist, isInWishlist, refreshWishlist } = useAuth();
+  const guest = useGuestCartWishlist();
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setActive(false);
-      return;
+    if (user) {
+      isInWishlist(productId).then(setActive).catch(() => {});
+    } else {
+      setActive(guest.isInWishlist(productId, variationId ?? null));
     }
-    isInWishlist(productId).then(setActive).catch(() => {});
-  }, [user, productId, isInWishlist]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, productId, variationId, guest.wishlist]);
 
   async function handleClick() {
-    if (!user) {
-      toast("Please login first to save to wishlist", { icon: "⚠️" });
-      if (onRequireLogin) {
-        onRequireLogin("Please sign in to save items to your wishlist.");
-      } else {
-        openLoginModal("Please sign in to save items to your wishlist.");
+    if (user) {
+      setLoading(true);
+      try {
+        const nowActive = await toggleWishlist(productId, variationId ?? null);
+        setActive(nowActive);
+        await refreshWishlist();
+      } finally {
+        setLoading(false);
       }
       return;
     }
-    setLoading(true);
-    try {
-      const nowActive = await toggleWishlist(productId, variationId);
-      setActive(nowActive);
-      await refreshWishlist();
-    } finally {
-      setLoading(false);
-    }
+
+    // Guest: save locally — no login required.
+    const nowActive = guest.toggleWishlist({
+      productId,
+      variationId: variationId ?? null,
+      name: productName ?? "Product",
+      price: productPrice ?? 0,
+      image: productImage ?? null,
+    });
+    setActive(nowActive);
+    toast(nowActive ? "Saved to wishlist" : "Removed from wishlist");
   }
 
   return (
     <button
       onClick={handleClick}
       disabled={loading}
-      aria-pressed={active}
-      title={active ? "Remove from wishlist" : "Add to wishlist"}
-      className={`w-11 h-11 flex items-center justify-center rounded border transition-all shrink-0 ${
+      aria-label={active ? "Remove from wishlist" : "Add to wishlist"}
+      className={`flex items-center justify-center w-14 rounded border transition-all ${
         active
           ? "border-[#9c7d23] text-[#9c7d23] bg-[#9c7d23]/5"
-          : "border-[#1A1A1A]/20 text-[#1A1A1A]/60 hover:border-[#9c7d23] hover:text-[#9c7d23]"
-      }`}
+          : "border-[#1A1A1A]/20 text-[#1A1A1A]/70 hover:border-[#9c7d23] hover:text-[#9c7d23]"
+      } ${loading ? "opacity-70 cursor-wait" : ""}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

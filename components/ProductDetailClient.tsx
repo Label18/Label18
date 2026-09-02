@@ -13,7 +13,7 @@ export default function ProductDetailClient({ product, initialColor }: { product
 
   const firstColor = initialColor || (variations.find((v) => v.color)?.color ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(firstColor);
-  
+
   const initialVariation = useMemo(() => {
     if (initialColor) {
       const match = variations.find(v => v.color === initialColor);
@@ -100,8 +100,8 @@ export default function ProductDetailClient({ product, initialColor }: { product
                     key={idx}
                     onClick={() => handleThumbnailClick(idx)}
                     className={`relative w-16 h-20 sm:w-20 sm:h-24 flex-shrink-0 rounded overflow-hidden border transition-all ${activeImageIndex === idx
-                        ? "border-[#9c7d23] ring-2 ring-[#9c7d23]/30 opacity-100"
-                        : "border-[#1A1A1A]/15 opacity-60 hover:opacity-100"
+                      ? "border-[#9c7d23] ring-2 ring-[#9c7d23]/30 opacity-100"
+                      : "border-[#1A1A1A]/15 opacity-60 hover:opacity-100"
                       }`}
                   >
                     <Image
@@ -152,6 +152,8 @@ export default function ProductDetailClient({ product, initialColor }: { product
             ) : (
               <ProductVariantSelector
                 productId={product.id}
+                productName={product.name}
+                productImage={product.image_url}
                 variations={variations}
                 selectedColorProp={selectedColor}
                 onColorChange={handleColorChange}

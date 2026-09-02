@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import { createClient } from "@/lib/supabase/client";
 
 type WishlistRow = {
@@ -27,11 +28,32 @@ type WishlistRow = {
   } | null;
 };
 
+type DisplayWishlistItem = {
+  key: string;
+  productId: string;
+  variationId: string | null;
+  name: string;
+  image: string | null;
+  color: string | null;
+  size: string | null;
+  price: number | null;
+  stockQuantity: number | null;
+};
+
 export default function WishlistPage() {
-  const { user, loading: authLoading, openLoginModal, toggleWishlist, addToCart, refreshWishlist, refreshCart } = useAuth();
+  const {
+    user,
+    loading: authLoading,
+    toggleWishlist,
+    addToCart,
+    refreshWishlist,
+    refreshCart,
+  } = useAuth();
+  const guest = useGuestCartWishlist();
   const supabase = createClient();
 
-  const [items, setItems] = useState<WishlistRow[]>([]);
+  const [rows, setRows] = useState<WishlistRow[]>([]);
+  const [guestDisplayItems, setGuestDisplayItems] = useState<DisplayWishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
@@ -39,7 +61,7 @@ export default function WishlistPage() {
 
   const loadWishlist = useCallback(async () => {
     if (!user) {
-      setItems([]);
+      setRows([]);
       setLoading(false);
       return;
     }
@@ -55,75 +77,154 @@ export default function WishlistPage() {
 
     if (error) {
       setError(error.message);
-      setItems([]);
+      setRows([]);
     } else {
-      setItems((data ?? []) as unknown as WishlistRow[]);
+      setRows((data ?? []) as unknown as WishlistRow[]);
     }
     setLoading(false);
   }, [user, supabase]);
 
-  useEffect(() => {
-    if (!authLoading) loadWishlist();
-  }, [authLoading, loadWishlist]);
+  // Guests: merge cached localStorage entries with fresh price/stock from
+  // Supabase so displayed data is never stale.
+  const loadGuestWishlist = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-  function setPending(productId: string, on: boolean) {
+    const localItems = guest.wishlist ?? [];
+    if (localItems.length === 0) {
+      setGuestDisplayItems([]);
+      setLoading(false);
+      return;
+    }
+
+    const variationIds = [
+      ...new Set(localItems.map((i) => i.variationId).filter(Boolean)),
+    ] as string[];
+
+    let freshById = new Map<string, any>();
+    if (variationIds.length > 0) {
+      const { data, error } = await supabase
+        .from("product_variations")
+        .select("id, price, compare_at_price, stock_quantity, color, size, image_url")
+        .in("id", variationIds);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        freshById = new Map((data ?? []).map((v: any) => [v.id, v]));
+      }
+    }
+
+    const display: DisplayWishlistItem[] = localItems.map((item) => {
+      const fresh = item.variationId ? freshById.get(item.variationId) : null;
+      return {
+        key: `${item.productId}-${item.variationId ?? "default"}`,
+        productId: item.productId,
+        variationId: item.variationId ?? null,
+        name: item.name,
+        image: fresh?.image_url ?? item.image ?? null,
+        color: fresh?.color ?? null,
+        size: fresh?.size ?? null,
+        price: fresh?.price != null ? Number(fresh.price) : item.price,
+        stockQuantity: fresh?.stock_quantity ?? null,
+      };
+    });
+
+    setGuestDisplayItems(display);
+    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guest.wishlist, supabase]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (user) {
+      loadWishlist();
+    } else {
+      loadGuestWishlist();
+    }
+  }, [authLoading, user, loadWishlist, loadGuestWishlist]);
+
+  function setPending(key: string, on: boolean) {
     setPendingIds((prev) => {
       const next = new Set(prev);
-      if (on) next.add(productId);
-      else next.delete(productId);
+      if (on) next.add(key);
+      else next.delete(key);
       return next;
     });
   }
 
-  async function handleRemove(productId: string) {
-    setPending(productId, true);
+  const displayItems: DisplayWishlistItem[] = useMemo(() => {
+    if (user) {
+      return rows.map((item) => {
+        const product = item.products;
+        const variation = item.product_variations;
+        return {
+          key: item.id,
+          productId: item.product_id,
+          variationId: item.variation_id,
+          name: product?.name ?? "Product",
+          image: variation?.image_url || product?.image_url || null,
+          color: variation?.color ?? null,
+          size: variation?.size ?? null,
+          price: variation?.price != null ? Number(variation.price) : null,
+          stockQuantity: variation?.stock_quantity ?? null,
+        };
+      });
+    }
+    return guestDisplayItems;
+  }, [user, rows, guestDisplayItems]);
+
+  async function handleRemove(item: DisplayWishlistItem) {
+    setPending(item.key, true);
     try {
-      await toggleWishlist(productId, null);
-      await loadWishlist();
-      await refreshWishlist();
+      if (user) {
+        await toggleWishlist(item.productId, null);
+        await loadWishlist();
+        await refreshWishlist();
+      } else {
+        guest.toggleWishlist({
+          productId: item.productId,
+          variationId: item.variationId,
+          name: item.name,
+          price: item.price ?? 0,
+          image: item.image,
+        });
+        await loadGuestWishlist();
+      }
     } catch (err: any) {
       setError(err?.message ?? "Couldn't remove item.");
     } finally {
-      setPending(productId, false);
+      setPending(item.key, false);
     }
   }
 
-  async function handleMoveToCart(item: WishlistRow) {
-    if (!item.variation_id) return; // no specific variation saved — send them to the product page instead
-    setPending(item.product_id, true);
+  async function handleMoveToCart(item: DisplayWishlistItem) {
+    if (!item.variationId) return; // no specific variation saved — send them to the product page instead
+    setPending(item.key, true);
     try {
-      await addToCart(item.product_id, item.variation_id, 1);
-      await refreshCart();
-      setMovedIds((prev) => new Set(prev).add(item.id));
+      if (user) {
+        await addToCart(item.productId, item.variationId, 1);
+        await refreshCart();
+      } else {
+        guest.addToCart(
+          {
+            productId: item.productId,
+            variationId: item.variationId,
+            name: item.name,
+            price: item.price ?? 0,
+            image: item.image,
+            color: item.color,
+            size: item.size,
+          },
+          1
+        );
+      }
+      setMovedIds((prev) => new Set(prev).add(item.key));
     } catch (err: any) {
       setError(err?.message ?? "Couldn't add to cart.");
     } finally {
-      setPending(item.product_id, false);
+      setPending(item.key, false);
     }
-  }
-
-  if (!authLoading && !user) {
-    return (
-      <main className="w-full min-h-screen bg-[#F8F6F0] text-[#1A1A1A] pt-32 pb-16 px-6 lg:px-16 flex items-center justify-center">
-        <div className="text-center max-w-sm">
-          <h1
-            className="text-2xl uppercase tracking-[0.15em] mb-4"
-           
-          >
-            Your Wishlist
-          </h1>
-          <p className="text-sm text-[#1A1A1A]/60 font-outfit font-light mb-6">
-            Sign in to view items you&apos;ve saved.
-          </p>
-          <button
-            onClick={openLoginModal}
-            className="px-8 py-3 rounded bg-[#1A1A1A] text-[#F8F6F0] text-[11px] tracking-[0.3em] uppercase font-outfit font-medium hover:bg-[#9c7d23] transition-all"
-          >
-            Login
-          </button>
-        </div>
-      </main>
-    );
   }
 
   return (
@@ -140,9 +241,9 @@ export default function WishlistPage() {
           <p className="text-[12px] font-outfit text-red-600/90 mb-6">{error}</p>
         )}
 
-        {loading ? (
+        {authLoading || loading ? (
           <p className="text-sm text-[#1A1A1A]/50 font-outfit font-light">Loading wishlist...</p>
-        ) : items.length === 0 ? (
+        ) : displayItems.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-sm text-[#1A1A1A]/60 font-outfit font-light mb-6">
               Your wishlist is empty.
@@ -156,25 +257,21 @@ export default function WishlistPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {items.map((item) => {
-              const product = item.products;
-              const variation = item.product_variations;
-              const image = variation?.image_url || product?.image_url;
-              const price = variation?.price != null ? Number(variation.price) : null;
-              const isPending = pendingIds.has(item.product_id);
-              const outOfStock = variation ? (variation.stock_quantity ?? 0) <= 0 : false;
-              const moved = movedIds.has(item.id);
+            {displayItems.map((item) => {
+              const isPending = pendingIds.has(item.key);
+              const outOfStock = item.stockQuantity != null ? item.stockQuantity <= 0 : false;
+              const moved = movedIds.has(item.key);
 
               return (
                 <div
-                  key={item.id}
+                  key={item.key}
                   className="bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 rounded-lg overflow-hidden group"
                 >
-                  <Link href={`/product/${item.product_id}`} className="relative block aspect-[4/5] bg-white">
-                    {image ? (
+                  <Link href={`/product/${item.productId}`} className="relative block aspect-[4/5] bg-white">
+                    {item.image ? (
                       <Image
-                        src={image}
-                        alt={product?.name ?? "Product"}
+                        src={item.image}
+                        alt={item.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -187,7 +284,7 @@ export default function WishlistPage() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        handleRemove(item.product_id);
+                        handleRemove(item);
                       }}
                       disabled={isPending}
                       title="Remove from wishlist"
@@ -199,24 +296,24 @@ export default function WishlistPage() {
 
                   <div className="p-4">
                     <Link
-                      href={`/product/${item.product_id}`}
+                      href={`/product/${item.productId}`}
                       className="block text-sm font-outfit font-medium uppercase tracking-wide hover:text-[#9c7d23] transition-colors line-clamp-2"
                     >
-                      {product?.name ?? "Product"}
+                      {item.name}
                     </Link>
 
-                    {variation && (
+                    {(item.color || item.size) && (
                       <p className="text-[11px] text-[#1A1A1A]/50 font-outfit font-light mt-1">
-                        {[variation.color, variation.size].filter(Boolean).join(" / ")}
+                        {[item.color, item.size].filter(Boolean).join(" / ")}
                       </p>
                     )}
 
-                    {price !== null && (
+                    {item.price !== null && (
                       <p
                         className="text-base font-outfit font-medium text-[#9c7d23] mt-2"
                        
                       >
-                        ₹{price.toLocaleString()}
+                        ₹{item.price.toLocaleString()}
                       </p>
                     )}
 
@@ -226,7 +323,7 @@ export default function WishlistPage() {
                       </p>
                     )}
 
-                    {item.variation_id ? (
+                    {item.variationId ? (
                       <button
                         onClick={() => handleMoveToCart(item)}
                         disabled={isPending || outOfStock || moved}
@@ -236,7 +333,7 @@ export default function WishlistPage() {
                       </button>
                     ) : (
                       <Link
-                        href={`/product/${item.product_id}`}
+                        href={`/product/${item.productId}`}
                         className="block w-full mt-3 py-2.5 rounded text-[10px] tracking-[0.25em] uppercase font-outfit font-medium bg-[#1A1A1A] text-[#F8F6F0] hover:bg-[#9c7d23] transition-all text-center"
                       >
                         Select Options

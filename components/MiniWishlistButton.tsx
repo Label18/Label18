@@ -2,46 +2,67 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import { toast } from "react-hot-toast";
 
 export default function MiniWishlistButton({
   productId,
   variationId,
+  // Needed so a guest's wishlist entry carries enough info to render
+  // on /wishlist without a DB lookup. Ignored for logged-in users.
+  productName,
+  productPrice,
+  productImage,
 }: {
   productId: string;
   variationId?: string | null;
+  productName?: string;
+  productPrice?: number | null;
+  productImage?: string | null;
 }) {
-  const { user, toggleWishlist, isInWishlist, refreshWishlist, openLoginModal } = useAuth();
+  const { user, toggleWishlist, isInWishlist, refreshWishlist } = useAuth();
+  const guest = useGuestCartWishlist();
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setActive(false);
-      return;
+    if (user) {
+      isInWishlist(productId).then(setActive).catch(() => {});
+    } else {
+      setActive(guest.isInWishlist(productId, variationId ?? null));
     }
-    isInWishlist(productId).then(setActive).catch(() => {});
-  }, [user, productId, isInWishlist]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, productId, variationId, guest.wishlist]);
 
   async function handleClick(e: React.MouseEvent) {
     e.preventDefault(); // Prevent navigating to product page if wrapped in Link
-    if (!user) {
-      toast("Please login first to save to wishlist", { icon: "⚠️" });
-      openLoginModal("Please sign in to save items to your wishlist.");
+
+    if (user) {
+      setLoading(true);
+      try {
+        const nowActive = await toggleWishlist(productId, variationId ?? null);
+        setActive(nowActive);
+        await refreshWishlist();
+      } finally {
+        setLoading(false);
+      }
       return;
     }
-    setLoading(true);
-    try {
-      const nowActive = await toggleWishlist(productId, variationId ?? null);
-      setActive(nowActive);
-      await refreshWishlist();
-    } finally {
-      setLoading(false);
-    }
+
+    // Guest: save locally — no login required.
+    const nowActive = guest.toggleWishlist({
+      productId,
+      variationId: variationId ?? null,
+      name: productName ?? "Product",
+      price: productPrice ?? 0,
+      image: productImage ?? null,
+    });
+    setActive(nowActive);
+    toast(nowActive ? "Saved to wishlist" : "Removed from wishlist");
   }
 
   return (
-    <button 
+    <button
       onClick={handleClick}
       disabled={loading}
       className={`transition-colors focus:outline-none ${active ? "text-[#9c7d23]" : "hover:text-[#9c7d23]"}`}

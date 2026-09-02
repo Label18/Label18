@@ -3,11 +3,14 @@
 import { useState, useMemo, useEffect } from "react";
 import { ProductVariation } from "@/lib/supabase/products";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGuestCartWishlist } from "@/contexts/GuestCartWishlistContext";
 import { toast } from "react-hot-toast";
 import WishlistButton from "@/components/WishlistButton";
 
 export default function ProductVariantSelector({
   productId,
+  productName,
+  productImage,
   variations = [],
   selectedColorProp,
   onColorChange,
@@ -15,13 +18,19 @@ export default function ProductVariantSelector({
   onRequireLogin,
 }: {
   productId: string;
+  // Used only for the guest (localStorage) cart/wishlist entry, so it has
+  // enough info to render on /cart and /wishlist without a DB lookup.
+  // Ignored for logged-in users.
+  productName?: string;
+  productImage?: string | null;
   variations?: ProductVariation[];
   selectedColorProp?: string | null;
   onColorChange?: (color: string | null) => void;
   onVariantChange?: (variant: ProductVariation | null) => void;
   onRequireLogin?: (reason?: string) => void;
 }) {
-  const { user, addToCart, refreshCart, openLoginModal } = useAuth();
+  const { user, addToCart, refreshCart } = useAuth();
+  const guest = useGuestCartWishlist();
 
   const sizes = useMemo(
     () => [...new Set(variations.map((v) => v.size).filter(Boolean))] as string[],
@@ -117,36 +126,46 @@ export default function ProductVariantSelector({
     return variations.some((v) => v.color === color && v.stock_quantity > 0);
   }
 
+  const displayPrice = activeVariation?.price ? Number(activeVariation.price) : null;
+  const displayComparePrice = activeVariation?.compare_at_price ? Number(activeVariation.compare_at_price) : null;
+
   async function handleAddToCart() {
     if (!activeVariation || !inStock) return;
 
-    if (!user) {
-      toast("Please login first to add to cart", { icon: "⚠️" });
-      if (onRequireLogin) {
-        onRequireLogin("Please sign in to add items to your shopping bag.");
-      } else {
-        openLoginModal("Please sign in to add items to your shopping bag.");
+    if (user) {
+      setCartError(null);
+      setAdding(true);
+      try {
+        await addToCart(productId, activeVariation.id, 1);
+        await refreshCart();
+        setAdded(true);
+        setTimeout(() => setAdded(false), 2000);
+      } catch (err) {
+        console.error("Add to cart failed:", err);
+        setCartError("Couldn't add to cart. Please try again.");
+      } finally {
+        setAdding(false);
       }
       return;
     }
 
-    setCartError(null);
-    setAdding(true);
-    try {
-      await addToCart(productId, activeVariation.id, 1);
-      await refreshCart();
-      setAdded(true);
-      setTimeout(() => setAdded(false), 2000);
-    } catch (err) {
-      console.error("Add to cart failed:", err);
-      setCartError("Couldn't add to cart. Please try again.");
-    } finally {
-      setAdding(false);
-    }
+    // Guest: save locally — no login required.
+    guest.addToCart(
+      {
+        productId,
+        variationId: activeVariation.id,
+        name: productName ?? "Product",
+        price: displayPrice ?? 0,
+        image: productImage ?? null,
+        color: selectedColor,
+        size: selectedSize,
+      },
+      1
+    );
+    setAdded(true);
+    toast.success("Added to cart");
+    setTimeout(() => setAdded(false), 2000);
   }
-
-  const displayPrice = activeVariation?.price ? Number(activeVariation.price) : null;
-  const displayComparePrice = activeVariation?.compare_at_price ? Number(activeVariation.compare_at_price) : null;
 
   return (
     <div className="space-y-6">
@@ -287,6 +306,9 @@ export default function ProductVariantSelector({
         <WishlistButton
           productId={productId}
           variationId={activeVariation?.id ?? null}
+          productName={productName}
+          productPrice={displayPrice}
+          productImage={productImage}
           onRequireLogin={onRequireLogin}
         />
       </div>

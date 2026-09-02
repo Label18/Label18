@@ -5,15 +5,16 @@ import Image from "next/image";
 import { useState, useMemo } from "react";
 import { ProductWithPrice } from "@/lib/supabase/products";
 import MiniWishlistButton from "./MiniWishlistButton";
+import MiniCartButton from "./MiniCartButton";
 
 export default function ProductCard({ product }: { product: ProductWithPrice }) {
   const defaultImage = product.image_url || product.product_variations[0]?.image_url;
-  
+
   // Extract unique colors that have an associated image or hex code
   const colorVariations = useMemo(() => {
     if (!product.product_variations) return [];
     const uniqueColors = new Map<string, { hex: string; img: string | null }>();
-    
+
     product.product_variations.forEach(v => {
       if (v.color && v.color_hex && !uniqueColors.has(v.color)) {
         uniqueColors.set(v.color, {
@@ -22,23 +23,24 @@ export default function ProductCard({ product }: { product: ProductWithPrice }) 
         });
       }
     });
-    
+
     return Array.from(uniqueColors.entries()).map(([color, data]) => ({
       color,
       hex: data.hex,
       img: data.img
     }));
   }, [product.product_variations]);
+
   const sizeVariations = useMemo(() => {
     if (!product.product_variations) return [];
     // Only extract sizes if there are no colors
     if (colorVariations.length > 0) return [];
-    
+
     const uniqueSizes = new Set<string>();
     product.product_variations.forEach(v => {
       if (v.size) uniqueSizes.add(v.size);
     });
-    
+
     return Array.from(uniqueSizes);
   }, [product.product_variations, colorVariations]);
 
@@ -56,26 +58,34 @@ export default function ProductCard({ product }: { product: ProductWithPrice }) 
   // Determine current price based on selected color
   const currentPrice = useMemo(() => {
     if (!product.product_variations) return product.minPrice;
-    const matchingVars = activeColor 
+    const matchingVars = activeColor
       ? product.product_variations.filter(v => v.color === activeColor && v.price != null)
       : product.product_variations.filter(v => v.price != null);
-    
+
     if (matchingVars.length > 0) {
       return Math.min(...matchingVars.map(v => Number(v.price)));
     }
     return product.minPrice;
   }, [activeColor, product.product_variations, product.minPrice]);
 
-  const activeVariationId = useMemo(() => {
-    if (!product.product_variations) return null;
-    const matchingVars = activeColor 
+  // Active variation now includes stock info so the cart button knows availability
+  const activeVariation = useMemo(() => {
+    if (!product.product_variations || product.product_variations.length === 0) return null;
+    const matchingVars = activeColor
       ? product.product_variations.filter(v => v.color === activeColor)
       : product.product_variations;
-    return matchingVars.length > 0 ? matchingVars[0].id : null;
+
+    if (matchingVars.length === 0) return null;
+
+    // Prefer an in-stock variation among the matches, fall back to the first
+    return matchingVars.find(v => v.stock_quantity > 0) ?? matchingVars[0];
   }, [activeColor, product.product_variations]);
 
-  const productUrl = activeColor 
-    ? `/product/${product.id}?color=${encodeURIComponent(activeColor)}` 
+  const activeVariationId = activeVariation?.id ?? null;
+  const activeVariationInStock = (activeVariation?.stock_quantity ?? 0) > 0;
+
+  const productUrl = activeColor
+    ? `/product/${product.id}?color=${encodeURIComponent(activeColor)}`
     : `/product/${product.id}`;
 
   return (
@@ -128,8 +138,8 @@ export default function ProductCard({ product }: { product: ProductWithPrice }) 
                 }}
                 title={variant.color}
                 className={`w-5 h-5 rounded-full border transition-all ${
-                  activeColor === variant.color 
-                    ? "border-[#9c7d23] ring-1 ring-[#9c7d23]/30 scale-110" 
+                  activeColor === variant.color
+                    ? "border-[#9c7d23] ring-1 ring-[#9c7d23]/30 scale-110"
                     : "border-[#1A1A1A]/20 hover:border-[#1A1A1A]/60"
                 }`}
                 style={{ backgroundColor: variant.hex }}
@@ -157,9 +167,24 @@ export default function ProductCard({ product }: { product: ProductWithPrice }) 
             </svg>
             <span className="text-[9px] tracking-[0.2em] font-medium uppercase">Details</span>
           </Link>
-          
+
           <div className="flex items-center gap-3 text-[#1A1A1A]/60">
-            <MiniWishlistButton productId={product.id} variationId={activeVariationId} />
+            <MiniWishlistButton
+              productId={product.id}
+              variationId={activeVariationId}
+              productName={product.name}
+              productPrice={currentPrice}
+              productImage={currentImage}
+            />
+            <MiniCartButton
+              productId={product.id}
+              variationId={activeVariationId}
+              productName={product.name}
+              productPrice={currentPrice}
+              productImage={currentImage}
+              color={activeColor}
+              inStock={activeVariationInStock}
+            />
             <Link href={productUrl} className="hover:text-[#9c7d23] transition-colors focus:text-[#9c7d23]">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
