@@ -12,8 +12,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 const sequences: SequenceConfig[] = [
-    { path: "/sequence1/ezgif-frame-", frameCount: 207 },
-    { path: "/sequence2/ezgif-frame-", frameCount: 300 },
+    { path: "/hero_frames/frame_", frameCount: 395, extension: "png", digits: 6 },
 ];
 
 const sequences2: SequenceConfig[] = [
@@ -55,10 +54,10 @@ export default function Home() {
     ) || categories[1];
 
     const fallbackClothingImages = [
-        "/sequence1/ezgif-frame-050.jpg",
-        "/sequence2/ezgif-frame-050.jpg",
-        "/sequence1/ezgif-frame-150.jpg",
-        "/sequence2/ezgif-frame-150.jpg",
+        "/hero_frames/frame_000050.jpg",
+        "/hero_frames/frame_000150.jpg",
+        "/hero_frames/frame_000250.jpg",
+        "/hero_frames/frame_000350.jpg",
     ];
 
     const fallbackJewelleryImages = [
@@ -198,13 +197,15 @@ export default function Home() {
     // Calculate counters
     const getCounter1 = (progress: number) => {
         let num = 1;
-        if (progress >= 0.875) num = 8;
-        else if (progress >= 0.75) num = 7;
-        else if (progress >= 0.625) num = 6;
-        else if (progress >= 0.5) num = 5;
-        else if (progress >= 0.375) num = 4;
-        else if (progress >= 0.25) num = 3;
-        else if (progress >= 0.125) num = 2;
+        if (progress >= 0.9) num = 10;
+        else if (progress >= 0.8) num = 9;
+        else if (progress >= 0.7) num = 8;
+        else if (progress >= 0.6) num = 7;
+        else if (progress >= 0.5) num = 6;
+        else if (progress >= 0.4) num = 5;
+        else if (progress >= 0.3) num = 4;
+        else if (progress >= 0.2) num = 3;
+        else if (progress >= 0.1) num = 2;
         return num;
     };
 
@@ -231,12 +232,13 @@ export default function Home() {
             {/* ============================================================ */}
             {/* HERO SECTION 1 - ETHNIC WEAR / CLOTHING                     */}
             {/* ============================================================ */}
-            <section id="hero" ref={scrollSectionRef} className="hero-section" style={{ height: "1200vh" }}>
+            <section id="hero" ref={scrollSectionRef} className="hero-section" style={{ height: "1000vh" }}>
                 <div className="hero-sticky">
                     <CanvasSequence
                         triggerRef={scrollSectionRef}
                         sequences={sequences}
                         className="hero-canvas"
+                        bgColor="black"
                     />
 
                     <div className="hero-gradient-overlay"></div>
@@ -244,84 +246,106 @@ export default function Home() {
                     <div ref={el => { textRefs.current[0] = el; }} className="hero-text-overlay text-first">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">The Label 18</span>
+                            <span className="accent-label">The Couture Edit</span>
                         </div>
                         <h1 className="hero-title-bold">
-                            <span style={{ color: "var(--color-gold)" }}>A NEW</span> <span style={{ color: "#ffffff" }}>ERA</span>
+                            <span style={{ color: "var(--color-gold)" }}>ROYAL</span> <span style={{ color: "#ffffff" }}>HERITAGE</span>
                         </h1>
-                        <p className="hero-desc">Discover an aesthetic defined by its energy and crafted with absolute precision.</p>
+                        <p className="hero-desc">An ode to royal poise, resham needlework, and timeless Indian silhouettes in golden daylight.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Craftsmanship</span>
+                            <span className="accent-label">Intricate Needlework</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>CRAFTED TO</span> <span style={{ color: "#ffffff" }}>PERFECTION</span>
+                            <span style={{ color: "var(--color-gold)" }}>ZARDOZI</span> <span style={{ color: "#ffffff" }}>BULLION</span>
                         </h2>
-                        <p className="hero-desc">Over 40 individual pieces, meticulously assembled by master artisans.</p>
+                        <p className="hero-desc">Over 80 hours of meticulous hand-embroidery adorning the bodice with antique silver threads.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[2] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Essence</span>
+                            <span className="accent-label">Artisanal Weave</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>EXPRESS YOUR</span> <span style={{ color: "#ffffff" }}>ESSENCE</span>
+                            <span style={{ color: "var(--color-gold)" }}>CHANDERI</span> <span style={{ color: "#ffffff" }}>LUSTRE</span>
                         </h2>
-                        <p className="hero-desc">Every detail, every stitch, designed to reflect your inner vitality.</p>
+                        <p className="hero-desc">Spun with natural organic sheen, breathable drape, and an ethereal golden-hour radiance.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Materials</span>
+                            <span className="accent-label">Signature Palette</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>PREMIUM</span> <span style={{ color: "#ffffff" }}>TEXTURES</span>
+                            <span style={{ color: "var(--color-gold)" }}>MEHNDI</span> <span style={{ color: "#ffffff" }}>OLIVE</span>
                         </h2>
-                        <p className="hero-desc">Exquisite materials engineered for absolute durability and an unforgettable touch.</p>
+                        <p className="hero-desc">An earthy, celebratory hue carefully dyed to catch ambient light with sophisticated warmth.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[4] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Elegance</span>
+                            <span className="accent-label">Sculpted Tailoring</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>TIMELESS</span> <span style={{ color: "#ffffff" }}>ELEGANCE</span>
+                            <span style={{ color: "var(--color-gold)" }}>ANARKALI</span> <span style={{ color: "#ffffff" }}>CASCADE</span>
                         </h2>
-                        <p className="hero-desc">Where modern design meets eternal grace. A perfect balance of form and function.</p>
+                        <p className="hero-desc">Fitted silhouette flowing into generous kalis that create fluid poetry in every movement.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Silhouette</span>
+                            <span className="accent-label">Gossamer Drape</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>COMPLETE</span> <span style={{ color: "#ffffff" }}>PROFILE</span>
+                            <span style={{ color: "var(--color-gold)" }}>ORGANZA</span> <span style={{ color: "#ffffff" }}>DUPATTA</span>
                         </h2>
-                        <p className="hero-desc">A stunning silhouette that commands attention from absolutely every angle.</p>
+                        <p className="hero-desc">Featherlight silk organza finished with delicate scallops that frame the shoulders with grace.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[6] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Luxury</span>
+                            <span className="accent-label">Heirloom Details</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>REFINED</span> <span style={{ color: "#ffffff" }}>LUXURY</span>
+                            <span style={{ color: "var(--color-gold)" }}>HAND-SET</span> <span style={{ color: "#ffffff" }}>MUKESH</span>
                         </h2>
-                        <p className="hero-desc">Uncompromised quality that speaks volumes without saying a single word.</p>
+                        <p className="hero-desc">Constellations of hand-pressed metallic sequins that shimmer subtly as the light shifts.</p>
                     </div>
 
-                    <div ref={el => { textRefs.current[7] = el; }} className="hero-text-overlay hero-text-right text-last">
+                    <div ref={el => { textRefs.current[7] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Collection</span>
+                            <span className="accent-label">Celebratory Aura</span>
+                        </div>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>FESTIVE</span> <span style={{ color: "#ffffff" }}>SPLENDOR</span>
+                        </h2>
+                        <p className="hero-desc">Curated for unforgettable wedding chapters, intimate mehendis, and grand regal evenings.</p>
+                    </div>
+
+                    <div ref={el => { textRefs.current[8] = el; }} className="hero-text-overlay hero-text-right">
+                        <div className="hero-accent-line">
+                            <div className="accent-bar"></div>
+                            <span className="accent-label">The Label 18 Muse</span>
+                        </div>
+                        <h2 className="hero-title-bold hero-title-md">
+                            <span style={{ color: "var(--color-gold)" }}>TIMELESS</span> <span style={{ color: "#ffffff" }}>CONFIDENCE</span>
+                        </h2>
+                        <p className="hero-desc">Crafted for the modern woman whose presence speaks of understated power and enduring charm.</p>
+                    </div>
+
+                    <div ref={el => { textRefs.current[9] = el; }} className="hero-text-overlay hero-text-right text-last">
+                        <div className="hero-accent-line">
+                            <div className="accent-bar"></div>
+                            <span className="accent-label">Complete Collection</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
                             <span style={{ color: "var(--color-gold)" }}>MAKE IT</span> <span style={{ color: "#ffffff" }}>YOURS</span>
@@ -337,9 +361,9 @@ export default function Home() {
                     </div>
 
                     <div className="hero-counter">
-                        <span className="counter-current">0{num1}</span>
+                        <span className="counter-current">{num1 < 10 ? `0${num1}` : num1}</span>
                         <div className="counter-divider"></div>
-                        <span className="counter-total">08</span>
+                        <span className="counter-total">10</span>
                     </div>
                 </div>
             </section>

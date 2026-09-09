@@ -10,18 +10,24 @@ gsap.registerPlugin(ScrollTrigger);
 export interface SequenceConfig {
   path: string; // e.g., "/sequence1/ezgif-frame-"
   frameCount: number; // e.g., 240
+  extension?: string; // e.g., "png" or "jpg", defaults to "jpg"
+  digits?: number; // e.g., 6, defaults to 3
 }
 
 interface CanvasSequenceProps {
   sequences: SequenceConfig[];
   className?: string;
   triggerRef: React.RefObject<HTMLElement | null>;
+  bgColor?: string;
+  fitMode?: "cover" | "contain-height" | "auto";
 }
 
 export default function CanvasSequence({
   sequences,
   className = "",
   triggerRef,
+  bgColor = "black",
+  fitMode = "auto",
 }: CanvasSequenceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
@@ -35,10 +41,12 @@ export default function CanvasSequence({
     let globalFrameIndex = 0;
 
     sequences.forEach((seq) => {
+      const ext = seq.extension || "jpg";
+      const padLength = seq.digits ?? 3;
       for (let i = 1; i <= seq.frameCount; i++) {
         const img = new Image();
-        const paddedIndex = i.toString().padStart(3, "0");
-        img.src = `${seq.path}${paddedIndex}.jpg`;
+        const paddedIndex = i.toString().padStart(padLength, "0");
+        img.src = `${seq.path}${paddedIndex}.${ext}`;
 
         const currentGlobalIndex = globalFrameIndex++;
 
@@ -63,11 +71,31 @@ export default function CanvasSequence({
   ) => {
     if (!img.width || !img.height) return;
 
-    const hRatio = canvas.width / img.width;
-    const vRatio = canvas.height / img.height;
-    const ratio = Math.max(hRatio, vRatio);
-    const centerShift_x = (canvas.width - img.width * ratio) / 2;
-    const centerShift_y = (canvas.height - img.height * ratio) / 2;
+    const imgAspect = img.width / img.height;
+    const canvasAspect = canvas.width / canvas.height;
+
+    let ratio: number;
+    let centerShift_x: number;
+    let centerShift_y: number;
+
+    if (fitMode === "cover") {
+      const hRatio = canvas.width / img.width;
+      const vRatio = canvas.height / img.height;
+      ratio = Math.max(hRatio, vRatio);
+      centerShift_x = (canvas.width - img.width * ratio) / 2;
+      centerShift_y = (canvas.height - img.height * ratio) / 2;
+    } else if (fitMode === "contain-height" || (fitMode === "auto" && imgAspect < 0.9 && canvasAspect > imgAspect)) {
+      // Portrait sequence on widescreen display: fit full height so head and feet are completely visible
+      ratio = canvas.height / img.height;
+      centerShift_x = (canvas.width - img.width * ratio) / 2;
+      centerShift_y = 0;
+    } else {
+      const hRatio = canvas.width / img.width;
+      const vRatio = canvas.height / img.height;
+      ratio = Math.max(hRatio, vRatio);
+      centerShift_x = (canvas.width - img.width * ratio) / 2;
+      centerShift_y = (canvas.height - img.height * ratio) / 2;
+    }
 
     ctx.drawImage(
       img,
@@ -90,7 +118,7 @@ export default function CanvasSequence({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.globalAlpha = 1;
-    ctx.fillStyle = "black";
+    ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawImageOnly(img, ctx, canvas);
   };
