@@ -8,7 +8,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen">
       {/* Sidebar uses `fixed` positioning (see Sidebar.tsx), which takes it out
-          of normal document flow — flexbox/`flex-1` on <main> does NOT push
+          of normal document flow — flexbox/`flex-1` on <main> does NOT push.
           past a fixed element. That's why content was rendering underneath it. */}
       <Sidebar />
 
