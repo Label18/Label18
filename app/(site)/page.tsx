@@ -12,7 +12,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 const sequences: SequenceConfig[] = [
-    { path: "/hero_frames/frame_", frameCount: 395, extension: "png", digits: 6 },
+    { path: "/hero_frames/frame_", frameCount: 395, extension: "jpg", digits: 6 },
 ];
 
 const sequences2: SequenceConfig[] = [
