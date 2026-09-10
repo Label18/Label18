@@ -32,7 +32,25 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/sequence:path*",
+        source: "/sequence3/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/sequence4/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/sequence5/:path*",
         headers: [
           {
             key: "Cache-Control",
