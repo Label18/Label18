@@ -21,6 +21,8 @@ interface CanvasSequenceProps {
   bgColor?: string;
   fitMode?: "cover" | "contain-height" | "auto";
   lazy?: boolean;
+  focalPointY?: "top" | "center";
+  offsetY?: number;
 }
 
 export default function CanvasSequence({
@@ -30,6 +32,8 @@ export default function CanvasSequence({
   bgColor = "black",
   fitMode = "auto",
   lazy = false,
+  focalPointY = "center",
+  offsetY = 0,
 }: CanvasSequenceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
@@ -85,20 +89,34 @@ export default function CanvasSequence({
         const vRatio = canvas.height / imgHeight;
         ratio = Math.max(hRatio, vRatio);
         centerShift_x = (canvas.width - imgWidth * ratio) / 2;
-        centerShift_y = (canvas.height - imgHeight * ratio) / 2;
+        if (focalPointY === "top") {
+          const scaledH = imgHeight * ratio;
+          centerShift_y = scaledH > canvas.height
+            ? Math.max(canvas.height - scaledH, offsetY)
+            : offsetY;
+        } else {
+          centerShift_y = (canvas.height - imgHeight * ratio) / 2 + offsetY;
+        }
       } else if (
         fitMode === "contain-height" ||
         (fitMode === "auto" && imgAspect < 0.9 && canvasAspect > imgAspect)
       ) {
         ratio = canvas.height / imgHeight;
         centerShift_x = (canvas.width - imgWidth * ratio) / 2;
-        centerShift_y = 0;
+        centerShift_y = offsetY;
       } else {
         const hRatio = canvas.width / imgWidth;
         const vRatio = canvas.height / imgHeight;
         ratio = Math.max(hRatio, vRatio);
         centerShift_x = (canvas.width - imgWidth * ratio) / 2;
-        centerShift_y = (canvas.height - imgHeight * ratio) / 2;
+        if (focalPointY === "top") {
+          const scaledH = imgHeight * ratio;
+          centerShift_y = scaledH > canvas.height
+            ? Math.max(canvas.height - scaledH, offsetY)
+            : offsetY;
+        } else {
+          centerShift_y = (canvas.height - imgHeight * ratio) / 2 + offsetY;
+        }
       }
 
       ctx.drawImage(

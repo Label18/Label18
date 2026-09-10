@@ -82,7 +82,7 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-500 bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.1)] ${
-        scrolled ? "py-3 md:py-4" : "py-4 md:py-5"
+        scrolled ? "py-3 md:py-4" : "py-3 md:py-4"
       }`}
     >
       <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -96,7 +96,7 @@ export default function Header() {
                 width={80}
                 height={80}
                 priority
-                className="h-12 w-12 md:h-14 md:w-14 object-contain rounded-sm"
+                className="h-10 w-10 md:h-12 md:w-12 object-contain rounded-sm"
               />
             </Link>
           </div>

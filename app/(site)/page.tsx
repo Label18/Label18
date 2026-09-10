@@ -240,6 +240,8 @@ export default function Home() {
                         sequences={sequences}
                         className="hero-canvas"
                         bgColor="black"
+                        focalPointY="top"
+                        offsetY={45}
                     />
 
                     <div className="hero-gradient-overlay"></div>
