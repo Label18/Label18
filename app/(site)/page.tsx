@@ -12,7 +12,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 const sequences: SequenceConfig[] = [
-    { path: "/hero_frames/frame_", frameCount: 395, extension: "jpg", digits: 6 },
+    { path: "/hero_frames/frame_", frameCount: 296, extension: "webp", digits: 6 },
 ];
 
 const sequences2: SequenceConfig[] = [
@@ -54,10 +54,10 @@ export default function Home() {
     ) || categories[1];
 
     const fallbackClothingImages = [
-        "/hero_frames/frame_000050.jpg",
-        "/hero_frames/frame_000150.jpg",
-        "/hero_frames/frame_000250.jpg",
-        "/hero_frames/frame_000350.jpg",
+        "/hero_frames/frame_000050.webp",
+        "/hero_frames/frame_000100.webp",
+        "/hero_frames/frame_000150.webp",
+        "/hero_frames/frame_000200.webp",
     ];
 
     const fallbackJewelleryImages = [
@@ -228,6 +228,7 @@ export default function Home() {
 
     return (
         <main ref={containerRef} className="bg-black">
+            <link rel="preload" as="image" href="/hero_frames/frame_000001.webp" type="image/webp" />
 
             {/* ============================================================ */}
             {/* HERO SECTION 1 - ETHNIC WEAR / CLOTHING                     */}
@@ -246,78 +247,78 @@ export default function Home() {
                     <div ref={el => { textRefs.current[0] = el; }} className="hero-text-overlay text-first">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">The Couture Edit</span>
+                            <span className="accent-label">Label 18 Experience</span>
                         </div>
                         <h1 className="hero-title-bold">
-                            <span style={{ color: "var(--color-gold)" }}>ROYAL</span> <span style={{ color: "#ffffff" }}>HERITAGE</span>
+                            <span style={{ color: "var(--color-gold)" }}>BOUTIQUE</span> <span style={{ color: "#ffffff" }}>ELEGANCE</span>
                         </h1>
-                        <p className="hero-desc">An ode to royal poise, resham needlework, and timeless Indian silhouettes in golden daylight.</p>
+                        <p className="hero-desc">Step into a world where timeless elegance meets contemporary grace in a curated setting.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[1] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Intricate Needlework</span>
+                            <span className="accent-label">Handwoven Mastery</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>ZARDOZI</span> <span style={{ color: "#ffffff" }}>BULLION</span>
+                            <span style={{ color: "var(--color-gold)" }}>ARTISANAL</span> <span style={{ color: "#ffffff" }}>SAREES</span>
                         </h2>
-                        <p className="hero-desc">Over 80 hours of meticulous hand-embroidery adorning the bodice with antique silver threads.</p>
+                        <p className="hero-desc">Discover the intricate weave of our signature silk sarees, crafted with absolute precision.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[2] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Artisanal Weave</span>
+                            <span className="accent-label">The Perfect Drape</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>CHANDERI</span> <span style={{ color: "#ffffff" }}>LUSTRE</span>
+                            <span style={{ color: "var(--color-gold)" }}>FLUID</span> <span style={{ color: "#ffffff" }}>POETRY</span>
                         </h2>
-                        <p className="hero-desc">Spun with natural organic sheen, breathable drape, and an ethereal golden-hour radiance.</p>
+                        <p className="hero-desc">Experience the lightweight comfort and fluid motion of our premium fabrics that flow with you.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[3] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Signature Palette</span>
+                            <span className="accent-label">Golden Details</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>MEHNDI</span> <span style={{ color: "#ffffff" }}>OLIVE</span>
+                            <span style={{ color: "var(--color-gold)" }}>ZARI</span> <span style={{ color: "#ffffff" }}>BORDERS</span>
                         </h2>
-                        <p className="hero-desc">An earthy, celebratory hue carefully dyed to catch ambient light with sophisticated warmth.</p>
+                        <p className="hero-desc">Gleaming golden borders that add a touch of royal heritage to every single silhouette.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[4] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Sculpted Tailoring</span>
+                            <span className="accent-label">Curated Collection</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>ANARKALI</span> <span style={{ color: "#ffffff" }}>CASCADE</span>
+                            <span style={{ color: "var(--color-gold)" }}>EXCLUSIVE</span> <span style={{ color: "#ffffff" }}>DESIGNS</span>
                         </h2>
-                        <p className="hero-desc">Fitted silhouette flowing into generous kalis that create fluid poetry in every movement.</p>
+                        <p className="hero-desc">A carefully curated selection of ethnic wear that speaks to your unique individual style.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[5] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Gossamer Drape</span>
+                            <span className="accent-label">Intimate Settings</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>ORGANZA</span> <span style={{ color: "#ffffff" }}>DUPATTA</span>
+                            <span style={{ color: "var(--color-gold)" }}>PERSONALIZED</span> <span style={{ color: "#ffffff" }}>STYLING</span>
                         </h2>
-                        <p className="hero-desc">Featherlight silk organza finished with delicate scallops that frame the shoulders with grace.</p>
+                        <p className="hero-desc">Enjoy a personalized boutique experience designed to find the perfect match for you.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[6] = el; }} className="hero-text-overlay hero-text-right">
                         <div className="hero-accent-line">
                             <div className="accent-bar"></div>
-                            <span className="accent-label">Heirloom Details</span>
+                            <span className="accent-label">Rich Hues</span>
                         </div>
                         <h2 className="hero-title-bold hero-title-md">
-                            <span style={{ color: "var(--color-gold)" }}>HAND-SET</span> <span style={{ color: "#ffffff" }}>MUKESH</span>
+                            <span style={{ color: "var(--color-gold)" }}>DEEP</span> <span style={{ color: "#ffffff" }}>INDIGO</span>
                         </h2>
-                        <p className="hero-desc">Constellations of hand-pressed metallic sequins that shimmer subtly as the light shifts.</p>
+                        <p className="hero-desc">Dive into our palette of rich, deep colors that capture ambient light beautifully.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[7] = el; }} className="hero-text-overlay hero-text-right pos-top-right">
@@ -328,7 +329,7 @@ export default function Home() {
                         <h2 className="hero-title-bold hero-title-md">
                             <span style={{ color: "var(--color-gold)" }}>FESTIVE</span> <span style={{ color: "#ffffff" }}>SPLENDOR</span>
                         </h2>
-                        <p className="hero-desc">Curated for unforgettable wedding chapters, intimate mehendis, and grand regal evenings.</p>
+                        <p className="hero-desc">Curated for unforgettable wedding chapters, intimate celebrations, and grand evenings.</p>
                     </div>
 
                     <div ref={el => { textRefs.current[8] = el; }} className="hero-text-overlay hero-text-right">
@@ -428,6 +429,7 @@ export default function Home() {
                         triggerRef={scrollSectionRef2}
                         sequences={sequences2}
                         className="hero-canvas"
+                        lazy={true}
                     />
 
                     <div className="hero-gradient-overlay"></div>

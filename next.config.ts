@@ -20,6 +20,28 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "10mb",
     },
   },
+  async headers() {
+    return [
+      {
+        source: "/hero_frames/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/sequence:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
