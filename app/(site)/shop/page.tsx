@@ -49,8 +49,8 @@ function buildBreadcrumbs(
 
 function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-8">
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 font-outfit font-light text-[11px] tracking-[0.15em] uppercase">
+    <nav aria-label="Breadcrumb" className="mb-8 overflow-x-auto whitespace-nowrap pb-2 scrollbar-thin">
+      <ol className="flex items-center gap-x-2 font-outfit font-light text-[11px] tracking-[0.15em] uppercase w-max">
         {crumbs.map((crumb, i) => (
           <li key={i} className="flex items-center gap-x-2">
             {i > 0 && <span className="text-[#9c7d23]/50">/</span>}

@@ -89,8 +89,20 @@ export default function ProductDetailClient({ product, initialColor }: { product
         {/* Top Section: Gallery & Variant Selector Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
 
-          {/* Left Column: Gallery */}
-          <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4">
+          {/* Left Column: Gallery & Mobile Title */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            
+            {/* Mobile Title & SKU (Visible only on lg and below) */}
+            <div className="block lg:hidden mb-2">
+              <p className="text-[10px] sm:text-[10.5px] tracking-[0.4em] uppercase font-outfit font-medium text-[#9c7d23] mb-2">
+                SKU: {product.sku}
+              </p>
+              <h1 className="font-normal text-2xl sm:text-3xl md:text-4xl tracking-[0.05em] uppercase text-[#1A1A1A]">
+                {product.name}
+              </h1>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row gap-4">
 
             {/* Small Thumbnails Column */}
             {images.length > 1 && (
@@ -135,15 +147,20 @@ export default function ProductDetailClient({ product, initialColor }: { product
 
           </div>
 
-          {/* Right Column: Title & Selector */}
-          <div className="lg:col-span-5 bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-8 md:p-10 rounded-lg shadow-sm">
-            <p className="text-[10.5px] tracking-[0.4em] uppercase font-outfit font-medium text-[#9c7d23] mb-2">
-              SKU: {product.sku}
-            </p>
+          </div>
 
-            <h1 className="font-normal text-3xl md:text-4xl tracking-[0.05em] uppercase text-[#1A1A1A] mb-6">
-              {product.name}
-            </h1>
+          {/* Right Column: Title & Selector */}
+          <div className="lg:col-span-5 bg-white/70 backdrop-blur-md border border-[#1A1A1A]/10 p-6 sm:p-8 md:p-10 rounded-lg shadow-sm">
+            
+            {/* Desktop Title & SKU (Hidden on lg and below) */}
+            <div className="hidden lg:block">
+              <p className="text-[10.5px] tracking-[0.4em] uppercase font-outfit font-medium text-[#9c7d23] mb-2">
+                SKU: {product.sku}
+              </p>
+              <h1 className="font-normal text-3xl md:text-4xl tracking-[0.05em] uppercase text-[#1A1A1A] mb-6">
+                {product.name}
+              </h1>
+            </div>
 
             {hasNoVariations ? (
               <p className="text-xs tracking-[0.2em] uppercase font-outfit font-light text-[#1A1A1A]/50 py-4">

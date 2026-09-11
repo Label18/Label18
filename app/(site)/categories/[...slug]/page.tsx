@@ -72,7 +72,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <span className="font-outfit font-light text-[10px] md:text-[12px] tracking-[0.5em] uppercase text-[#d4af37] mb-6 block drop-shadow-md">
               Collection
             </span>
-            <h1 className="font-outfit font-light text-5xl md:text-7xl lg:text-8xl text-white tracking-widest uppercase drop-shadow-lg">
+            <h1 className="font-outfit font-light text-4xl md:text-7xl lg:text-8xl text-white tracking-widest uppercase drop-shadow-lg">
               {currentName}
             </h1>
             {currentDescription && (
@@ -93,7 +93,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           <span className="font-outfit font-light text-[10px] tracking-[0.5em] uppercase text-[#9c7d23] mb-4 block">
             Category
           </span>
-          <h1 className="font-outfit font-light text-4xl md:text-6xl text-[#1A1A1A] tracking-widest uppercase">
+          <h1 className="font-outfit font-light text-3xl md:text-6xl text-[#1A1A1A] tracking-widest uppercase">
             {currentName}
           </h1>
           {currentDescription && (
@@ -112,8 +112,8 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-16">
         {/* Breadcrumbs */}
-        <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 font-outfit font-medium text-[11px] tracking-[0.15em] uppercase text-[#1A1A1A]/70">
+        <nav aria-label="Breadcrumb" className="mb-8 overflow-x-auto whitespace-nowrap pb-2 scrollbar-thin">
+          <ol className="flex items-center gap-x-2 font-outfit font-medium text-[11px] tracking-[0.15em] uppercase text-[#1A1A1A]/70 w-max">
             <li className="flex items-center gap-x-2">
               <Link href="/" className="hover:text-[#9c7d23] transition-colors">Home</Link>
             </li>

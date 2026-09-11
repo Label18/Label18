@@ -113,7 +113,7 @@ export default function ProductCard({ product }: { product: ProductWithPrice }) 
 
       <div className="p-5 flex flex-col flex-1">
         {/* Title and Price */}
-        <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4 mb-4">
           <Link href={productUrl} className="hover:text-[#9c7d23] transition-colors">
             <h3 className="font-outfit font-medium text-[13px] tracking-wide text-[#1A1A1A] line-clamp-1 uppercase">
               {product.name}
