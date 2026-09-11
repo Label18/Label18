@@ -12,7 +12,7 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 const sequences: SequenceConfig[] = [
-    { path: "/client_4k_frames/frame_", frameCount: 146, startFrame: 5, extension: "webp", digits: 6 },
+    { path: "/client_4k_frames/frame_", frameCount: 145, startFrame: 6, extension: "webp", digits: 6 },
     { path: "/client_2_frames/frame_", frameCount: 150, extension: "webp", digits: 6 },
 ];
 
@@ -229,7 +229,7 @@ export default function Home() {
 
     return (
         <main ref={containerRef} className="bg-black">
-            <link rel="preload" as="image" href="/client_4k_frames/frame_000005.webp" type="image/webp" />
+            <link rel="preload" as="image" href="/client_4k_frames/frame_000006.webp" type="image/webp" />
 
             {/* ============================================================ */}
             {/* HERO SECTION 1 - ETHNIC WEAR / CLOTHING                     */}
