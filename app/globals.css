@@ -299,7 +299,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    filter: contrast(1.07) saturate(1.16) brightness(1.03);
     will-change: transform;
 }
 
