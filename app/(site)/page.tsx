@@ -12,7 +12,8 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger);
 
 const sequences: SequenceConfig[] = [
-    { path: "/hero_frames/frame_", frameCount: 296, extension: "webp", digits: 6 },
+    { path: "/client_4k_frames/frame_", frameCount: 146, startFrame: 5, extension: "png", digits: 6 },
+    { path: "/client_2_frames/frame_", frameCount: 150, extension: "png", digits: 6 },
 ];
 
 const sequences2: SequenceConfig[] = [
@@ -54,10 +55,10 @@ export default function Home() {
     ) || categories[1];
 
     const fallbackClothingImages = [
-        "/hero_frames/frame_000050.webp",
-        "/hero_frames/frame_000100.webp",
-        "/hero_frames/frame_000150.webp",
-        "/hero_frames/frame_000200.webp",
+        "/client_4k_frames/frame_000050.png",
+        "/client_4k_frames/frame_000100.png",
+        "/client_2_frames/frame_000050.png",
+        "/client_2_frames/frame_000100.png",
     ];
 
     const fallbackJewelleryImages = [
@@ -228,7 +229,7 @@ export default function Home() {
 
     return (
         <main ref={containerRef} className="bg-black">
-            <link rel="preload" as="image" href="/hero_frames/frame_000001.webp" type="image/webp" />
+            <link rel="preload" as="image" href="/client_4k_frames/frame_000005.png" type="image/png" />
 
             {/* ============================================================ */}
             {/* HERO SECTION 1 - ETHNIC WEAR / CLOTHING                     */}

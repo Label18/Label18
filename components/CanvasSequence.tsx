@@ -12,6 +12,7 @@ export interface SequenceConfig {
   frameCount: number; // e.g., 240
   extension?: string; // e.g., "png" or "jpg", defaults to "jpg"
   digits?: number; // e.g., 6, defaults to 3
+  startFrame?: number; // e.g., 5, defaults to 1
 }
 
 interface CanvasSequenceProps {
@@ -241,9 +242,11 @@ export default function CanvasSequence({
     sequences.forEach((seq) => {
       const ext = seq.extension || "jpg";
       const padLength = seq.digits ?? 3;
-      for (let i = 1; i <= seq.frameCount; i++) {
+      const start = seq.startFrame || 1;
+      for (let i = 0; i < seq.frameCount; i++) {
+        const frameIndex = start + i;
         const img = new Image();
-        const paddedIndex = i.toString().padStart(padLength, "0");
+        const paddedIndex = frameIndex.toString().padStart(padLength, "0");
         img.src = `${seq.path}${paddedIndex}.${ext}`;
 
         const currentGlobalIndex = globalFrameIndex++;
