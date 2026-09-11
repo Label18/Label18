@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { login } from './actions'
+import SubmitButton from './SubmitButton'
 
 export default async function LoginPage({
     searchParams,
@@ -107,12 +108,7 @@ export default async function LoginPage({
                         )}
 
                         <div className="pt-2">
-                            <button
-                                type="submit"
-                                className="w-full rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#C5A059] py-4 text-xs font-bold tracking-widest uppercase text-[#030303] shadow-lg transition-all duration-200 hover:brightness-110 active:scale-[0.99]"
-                            >
-                                Access Dashboard
-                            </button>
+                            <SubmitButton />
                         </div>
                     </form>
 
