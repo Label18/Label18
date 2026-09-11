@@ -77,6 +77,10 @@ export async function createProduct(formData: FormData) {
     const size = (String(formData.get(`variations[${i}][size]`) || '').trim()) || null
     const color = (String(formData.get(`variations[${i}][color]`) || '').trim()) || null
     const color_hex = (String(formData.get(`variations[${i}][color_hex]`) || '').trim()) || null
+    // color_family groups shades together (e.g. "Rose Pink" / "Hot Pink" -> "Pink")
+    // so a storefront search/filter for "Pink" can match every shade.
+    const color_family =
+      (String(formData.get(`variations[${i}][color_family]`) || '').trim()) || null
     const stock_quantity = Number(formData.get(`variations[${i}][stock]`) || 0)
     const price = Number(formData.get(`variations[${i}][price]`) || 0)
     const compareRaw = formData.get(`variations[${i}][compare_at_price]`)
@@ -94,6 +98,7 @@ export async function createProduct(formData: FormData) {
       size,
       color,
       color_hex,
+      color_family,
       stock_quantity,
       price,
       compare_at_price,

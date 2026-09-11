@@ -11,6 +11,7 @@ import {
   Layers,
   CheckCircle2,
   AlertCircle,
+  ChevronDown,
 } from 'lucide-react'
 import { createProduct } from './actions'
 
@@ -23,6 +24,7 @@ type Variation = {
   size: string
   color: string
   color_hex: string
+  color_family: string
   stock: string
   price: string
   compare_at_price: string
@@ -35,11 +37,126 @@ function emptyVariation(): Variation {
     size: '',
     color: '',
     color_hex: '',
+    color_family: '',
     stock: '0',
     price: '',
     compare_at_price: '',
     image: null,
   }
+}
+
+// ---- Color palette --------------------------------------------------------
+// Every shade belongs to a "family". Storing color_family alongside the
+// specific shade lets a storefront search for "Pink" and match every
+// variation whose family is Pink, regardless of which exact shade it is.
+
+const COLOR_PALETTE: { family: string; hex: string; shades: { name: string; hex: string }[] }[] = [
+  {
+    family: 'Pink',
+    hex: '#FF66CC',
+    shades: [
+      { name: 'Baby Pink', hex: '#F4C2C2' },
+      { name: 'Blush Pink', hex: '#DE5D83' },
+      { name: 'Rose Pink', hex: '#FF66CC' },
+      { name: 'Hot Pink', hex: '#FF69B4' },
+      { name: 'Fuchsia', hex: '#FF00FF' },
+      { name: 'Salmon Pink', hex: '#FF91A4' },
+      { name: 'Magenta', hex: '#D6336C' },
+    ],
+  },
+  {
+    family: 'Red',
+    hex: '#E53935',
+    shades: [
+      { name: 'Crimson', hex: '#DC143C' },
+      { name: 'Scarlet', hex: '#FF2400' },
+      { name: 'Maroon', hex: '#800000' },
+      { name: 'Brick Red', hex: '#B22222' },
+      { name: 'Cherry Red', hex: '#D2042D' },
+    ],
+  },
+  {
+    family: 'Orange',
+    hex: '#FB8C00',
+    shades: [
+      { name: 'Burnt Orange', hex: '#CC5500' },
+      { name: 'Tangerine', hex: '#F28500' },
+      { name: 'Peach', hex: '#FFCBA4' },
+      { name: 'Amber', hex: '#FFBF00' },
+    ],
+  },
+  {
+    family: 'Yellow',
+    hex: '#FDD835',
+    shades: [
+      { name: 'Mustard', hex: '#E1AD01' },
+      { name: 'Lemon Yellow', hex: '#FFF44F' },
+      { name: 'Gold', hex: '#D4AF37' },
+      { name: 'Cream', hex: '#FFFDD0' },
+    ],
+  },
+  {
+    family: 'Green',
+    hex: '#43A047',
+    shades: [
+      { name: 'Olive', hex: '#808000' },
+      { name: 'Sage Green', hex: '#9CAF88' },
+      { name: 'Emerald', hex: '#50C878' },
+      { name: 'Forest Green', hex: '#228B22' },
+      { name: 'Mint', hex: '#98FF98' },
+      { name: 'Khaki', hex: '#C3B091' },
+    ],
+  },
+  {
+    family: 'Blue',
+    hex: '#1E88E5',
+    shades: [
+      { name: 'Navy Blue', hex: '#001F54' },
+      { name: 'Sky Blue', hex: '#87CEEB' },
+      { name: 'Royal Blue', hex: '#4169E1' },
+      { name: 'Denim Blue', hex: '#1560BD' },
+      { name: 'Teal', hex: '#008080' },
+      { name: 'Turquoise', hex: '#40E0D0' },
+    ],
+  },
+  {
+    family: 'Purple',
+    hex: '#8E24AA',
+    shades: [
+      { name: 'Lavender', hex: '#B57EDC' },
+      { name: 'Lilac', hex: '#C8A2C8' },
+      { name: 'Violet', hex: '#7F00FF' },
+      { name: 'Plum', hex: '#8E4585' },
+    ],
+  },
+  {
+    family: 'Brown',
+    hex: '#6D4C41',
+    shades: [
+      { name: 'Tan', hex: '#D2B48C' },
+      { name: 'Camel', hex: '#C19A6B' },
+      { name: 'Chocolate Brown', hex: '#7B3F00' },
+      { name: 'Chestnut', hex: '#954535' },
+      { name: 'Beige', hex: '#F5F5DC' },
+    ],
+  },
+  {
+    family: 'Neutral',
+    hex: '#9E9E9E',
+    shades: [
+      { name: 'Black', hex: '#000000' },
+      { name: 'White', hex: '#FFFFFF' },
+      { name: 'Ivory', hex: '#FFFFF0' },
+      { name: 'Charcoal Grey', hex: '#36454F' },
+      { name: 'Light Grey', hex: '#D3D3D3' },
+      { name: 'Silver', hex: '#C0C0C0' },
+    ],
+  },
+]
+
+function findShade(colorFamily: string, colorName: string) {
+  const fam = COLOR_PALETTE.find((f) => f.family === colorFamily)
+  return fam?.shades.find((s) => s.name === colorName) ?? null
 }
 
 // ---- SKU auto-numbering helpers ----------------------------------------
@@ -117,6 +234,137 @@ function ImagePicker({
         </button>
       )}
     </div>
+  )
+}
+
+// ---- Color picker (Family -> Shade) ---------------------------------------
+// Search-friendly: picking "Pink" as the family, then a specific shade,
+// stores both the exact shade (color/color_hex) and the broader family
+// (color_family) so a storefront filter for "Pink" matches every shade.
+
+function ColorPicker({
+  colorFamily,
+  colorName,
+  colorHex,
+  onChange,
+}: {
+  colorFamily: string
+  colorName: string
+  colorHex: string
+  onChange: (patch: { color_family?: string; color?: string; color_hex?: string }) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const activeFamily = COLOR_PALETTE.find((f) => f.family === colorFamily)
+  const swatchHex = colorHex || activeFamily?.hex || '#E5E5E5'
+
+  // Lock body scroll while the modal is open so the page doesn't scroll
+  // behind it.
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm text-black outline-none transition-colors focus:border-black"
+      >
+        <span className="flex items-center gap-2 truncate">
+          <span
+            className="h-5 w-5 shrink-0 rounded-full border border-stone-300"
+            style={{ backgroundColor: swatchHex }}
+          />
+          <span className="truncate text-left">
+            {colorName ? (
+              <>
+                {colorName}
+                <span className="ml-1 text-stone-400">· {colorFamily}</span>
+              </>
+            ) : (
+              <span className="text-stone-400">Select color</span>
+            )}
+          </span>
+        </span>
+        <ChevronDown size={14} className="shrink-0 text-stone-400" />
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+          >
+            <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+              <div>
+                <h3 className="text-sm font-bold text-black">Select Color</h3>
+                <p className="text-xs text-stone-400">Pick a family, then the exact shade</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="text-stone-400 hover:text-black"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4">
+              {COLOR_PALETTE.map((fam) => (
+                <div key={fam.family} className="mb-5 last:mb-0">
+                  <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
+                    <span
+                      className="h-3 w-3 rounded-full border border-stone-300"
+                      style={{ backgroundColor: fam.hex }}
+                    />
+                    {fam.family}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {fam.shades.map((shade) => {
+                      const active = colorFamily === fam.family && colorName === shade.name
+                      return (
+                        <button
+                          key={shade.name}
+                          type="button"
+                          onClick={() => {
+                            onChange({
+                              color_family: fam.family,
+                              color: shade.name,
+                              color_hex: shade.hex,
+                            })
+                            setOpen(false)
+                          }}
+                          className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs font-medium transition-colors ${
+                            active
+                              ? 'border-black bg-stone-100 text-black'
+                              : 'border-stone-200 text-stone-600 hover:border-stone-400'
+                          }`}
+                        >
+                          <span
+                            className="h-4 w-4 shrink-0 rounded-full border border-stone-300"
+                            style={{ backgroundColor: shade.hex }}
+                          />
+                          <span className="truncate">{shade.name}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
@@ -198,6 +446,7 @@ export default function ProductForm({
       formData.set(`variations[${i}][size]`, v.size)
       formData.set(`variations[${i}][color]`, v.color)
       formData.set(`variations[${i}][color_hex]`, v.color_hex)
+      formData.set(`variations[${i}][color_family]`, v.color_family)
       formData.set(`variations[${i}][stock]`, v.stock)
       formData.set(`variations[${i}][price]`, v.price)
       formData.set(`variations[${i}][compare_at_price]`, v.compare_at_price)
@@ -429,22 +678,13 @@ export default function ProductForm({
                       className={inputClass}
                     />
                   </div>
-                  <div className="space-y-1">
+                  <div className="col-span-2 space-y-1 sm:col-span-2">
                     <label className="text-[11px] font-medium text-stone-500">Color</label>
-                    <input
-                      value={v.color}
-                      onChange={(e) => updateVariation(v.key, { color: e.target.value })}
-                      placeholder="Black"
-                      className={inputClass}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-medium text-stone-500">Swatch</label>
-                    <input
-                      type="color"
-                      value={v.color_hex || '#000000'}
-                      onChange={(e) => updateVariation(v.key, { color_hex: e.target.value })}
-                      className="h-[42px] w-full cursor-pointer rounded-xl border border-stone-300 bg-white p-1"
+                    <ColorPicker
+                      colorFamily={v.color_family}
+                      colorName={v.color}
+                      colorHex={v.color_hex}
+                      onChange={(patch) => updateVariation(v.key, patch)}
                     />
                   </div>
                   <div className="space-y-1">
