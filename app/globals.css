@@ -19,7 +19,7 @@
 
 /* === DESIGN TOKENS === */
 :root {
-     --color-bg: #F8F6F0;
+    --color-bg: #F8F6F0;
     --color-bg-alt: #111111;
     --color-bg-card: #141414;
     --color-surface: #1a1a1a;
@@ -66,6 +66,7 @@
    wrapper, unlayered CSS beats @layer utilities regardless of source order,
    which was silently stripping every margin/padding utility in the app. */
 @layer base {
+
     *,
     *::before,
     *::after {
@@ -2894,7 +2895,8 @@
 .intro-overlay.is-scrolled .intro-content {
     top: auto;
     left: auto;
-    bottom: 4.5rem;   /* sits just above .hero-counter (bottom: 2rem) */
+    bottom: 4.5rem;
+    /* sits just above .hero-counter (bottom: 2rem) */
     right: 6%;
     transform: translate(0, 0);
     text-align: right;
@@ -2985,4 +2987,15 @@ body {
     --font-body: var(--font-cormorant);
     --font-heading: var(--font-cinzel);
     --font-serif: var(--font-playfair);
+}
+
+/* Force first hero section peach/gold text to dark yellow */
+#hero .hero-text-overlay span[style*="var(--color-gold)"] {
+    color: #9C7D23 !important;
+}
+#hero .accent-label {
+    color: #9C7D23 !important;
+}
+#hero .accent-bar {
+    background: #9C7D23 !important;
 }
